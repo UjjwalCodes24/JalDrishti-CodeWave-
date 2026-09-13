@@ -11,6 +11,47 @@ const routeColors = {
 
 const DEFAULT_CENTER = [20.5937, 78.9629]
 
+function FloodIntelOverlay({ routingResult }) {
+  const route = routingResult?.recommended
+  if (!route) return null
+
+  const depth = route.maximumWaterDepth ?? 0
+  const blocked = route.blockedSegments ?? 0
+  const exposure =
+    route.safetyRating === 'SAFE' ? 'Low'
+    : route.safetyRating === 'MODERATE' || route.safetyRating === 'CAUTION' ? 'Moderate'
+    : 'High'
+  const status =
+    route.safetyRating === 'SAFE' ? 'Safe Corridor'
+    : route.safetyRating === 'MODERATE' || route.safetyRating === 'CAUTION' ? 'Caution'
+    : 'High Risk'
+
+  const depthClass = depth >= 30 ? 'danger' : depth >= 15 ? 'warn' : 'safe'
+  const exposureClass = exposure === 'Low' ? 'safe' : exposure === 'Moderate' ? 'warn' : 'danger'
+  const statusClass = status === 'Safe Corridor' ? 'safe' : status === 'Caution' ? 'warn' : 'danger'
+
+  return (
+    <div className="route-map-flood-intel" aria-label="Flood intelligence summary">
+      <div className="intel-stat">
+        <span className="intel-stat-label">Flood Exposure</span>
+        <span className={`intel-stat-value ${exposureClass}`}>{exposure}</span>
+      </div>
+      <div className="intel-stat">
+        <span className="intel-stat-label">Max Water Depth</span>
+        <span className={`intel-stat-value ${depthClass}`}>{depth} cm</span>
+      </div>
+      <div className="intel-stat">
+        <span className="intel-stat-label">Blocked Roads</span>
+        <span className={`intel-stat-value ${blocked > 0 ? 'warn' : 'safe'}`}>{blocked}</span>
+      </div>
+      <div className="intel-stat">
+        <span className="intel-stat-label">Route Status</span>
+        <span className={`intel-stat-value ${statusClass}`}>{status}</span>
+      </div>
+    </div>
+  )
+}
+
 function toLatLng(point) {
   if (!point) return null
   if (Array.isArray(point) && point.length >= 2) {
@@ -216,6 +257,7 @@ function RouteMap({ routingResult, regionCenter, mapKey }) {
   return (
     <div className="route-map-wrap">
       <div ref={mapRef} className="route-map" />
+      <FloodIntelOverlay routingResult={routingResult} />
       <div className="route-map-legend">
         <span><i style={{ background: routeColors.recommended }} />Recommended Safe Route</span>
         <span><i style={{ background: routeColors.alternative }} />Alternative Route</span>
@@ -330,6 +372,7 @@ function FallbackRouteMap({ routingResult, regionCenter, mapKey }) {
           )
         })}
       </MapContainer>
+      <FloodIntelOverlay routingResult={routingResult} />
       <div className="route-map-legend">
         <span><i style={{ background: routeColors.recommended }} />Recommended Safe Route</span>
         <span><i style={{ background: routeColors.alternative }} />Alternative Route</span>
