@@ -1,0 +1,13 @@
+{
+  "rainfallSeries": [
+    { "time": "Now", "value": 42 },
+    { "time": "+30m", "value": 47 },
+    { "time": "+60m", "value": 51 },
+    { "time": "+90m", "value": 58 },
+    { "time": "+120m", "value": 54 },
+    { "time": "+180m", "value": 39 }
+  ],
+  "confidence": 82,
+  "window": "Next 3 hours",
+  "summary": "Rainfall is expected to intensify across the Mithi Basin before easing after the 90-minute mark."
+}

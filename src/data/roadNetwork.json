@@ -1,0 +1,38 @@
+{
+  "mode": "DEMO ROAD NETWORK",
+  "source": "SIMULATED FLOOD-AWARE ROUTING",
+  "nodes": [
+    { "id": "KURLA", "name": "Kurla Station", "latitude": 19.0728, "longitude": 72.8826 },
+    { "id": "SION", "name": "Sion Hospital", "latitude": 19.0466, "longitude": 72.8631 },
+    { "id": "BKC", "name": "Bandra Kurla Complex", "latitude": 19.0633, "longitude": 72.8681 },
+    { "id": "MITHI", "name": "Mithi River Corridor", "latitude": 19.0661, "longitude": 72.8747 },
+    { "id": "DHARAVI", "name": "Dharavi Junction", "latitude": 19.0397, "longitude": 72.8531 },
+    { "id": "AIRPORT", "name": "Mumbai Airport", "latitude": 19.0974, "longitude": 72.8746 },
+    { "id": "BANDRA", "name": "Bandra West", "latitude": 19.0607, "longitude": 72.8362 },
+    { "id": "ANDHERI", "name": "Andheri East", "latitude": 19.1136, "longitude": 72.8697 },
+    { "id": "DADAR", "name": "Dadar TT", "latitude": 19.0178, "longitude": 72.8478 },
+    { "id": "CHEMBUR", "name": "Chembur East", "latitude": 19.0522, "longitude": 72.9005 },
+    { "id": "GHATKOPAR", "name": "Ghatkopar West", "latitude": 19.0860, "longitude": 72.9080 },
+    { "id": "LOWER_PAREL", "name": "Lower Parel", "latitude": 19.0016, "longitude": 72.8302 }
+  ],
+  "segments": [
+    { "id": "RD-KUR-MIT", "name": "Kurla Station Road", "source": "KURLA", "target": "MITHI", "distance": 1.8, "travelTime": 7, "floodStreetId": "ST-KUR-01", "floodFactor": 0.35 },
+    { "id": "RD-KUR-AIR", "name": "Kurla Airport Link", "source": "KURLA", "target": "AIRPORT", "distance": 3.4, "travelTime": 10, "floodStreetId": "ST-KUR-02", "floodFactor": 0.14 },
+    { "id": "RD-MIT-SION", "name": "Mithi River Service Road", "source": "MITHI", "target": "SION", "distance": 2.2, "travelTime": 8, "floodStreetId": "ST-MIT-01", "floodFactor": 0.1 },
+    { "id": "RD-MIT-BKC", "name": "Mithi BKC Connector", "source": "MITHI", "target": "BKC", "distance": 1.4, "travelTime": 5, "floodStreetId": "ST-MIT-01", "floodFactor": 0.08 },
+    { "id": "RD-AIR-BKC", "name": "Saki Naka Link Road", "source": "AIRPORT", "target": "BKC", "distance": 3.1, "travelTime": 11, "floodStreetId": "ST-SAK-01", "floodFactor": 0.12 },
+    { "id": "RD-AIR-BKC-ALT", "name": "Airport Elevated Connector", "source": "AIRPORT", "target": "BKC", "distance": 4.2, "travelTime": 14, "floodStreetId": "ST-SAK-01", "floodFactor": 0.04 },
+    { "id": "RD-BKC-SION", "name": "BKC Sion Link", "source": "BKC", "target": "SION", "distance": 2.5, "travelTime": 9, "floodStreetId": "ST-BKC-01", "floodFactor": 0.1 },
+    { "id": "RD-BKC-DHA", "name": "Dharavi Connector", "source": "BKC", "target": "DHARAVI", "distance": 2.4, "travelTime": 9, "floodStreetId": "ST-BKC-01", "floodFactor": 0.08 },
+    { "id": "RD-DHA-SION", "name": "Dharavi Junction Road", "source": "DHARAVI", "target": "SION", "distance": 2.1, "travelTime": 8, "floodStreetId": "ST-MIT-01", "floodFactor": 0.22 },
+    { "id": "RD-DHA-BAN", "name": "Dharavi Bandra Link", "source": "DHARAVI", "target": "BANDRA", "distance": 2.8, "travelTime": 10, "floodStreetId": "ST-MIT-01", "floodFactor": 0.12 },
+    { "id": "RD-BKC-BAN", "name": "BKC Bandra Link", "source": "BKC", "target": "BANDRA", "distance": 3.5, "travelTime": 12, "floodStreetId": "ST-BKC-01", "floodFactor": 0.07 },
+    { "id": "RD-AND-AIR", "name": "Western Express Highway Andheri", "source": "ANDHERI", "target": "AIRPORT", "distance": 2.2, "travelTime": 7, "floodStreetId": "ST-SAK-01", "floodFactor": 0.05 },
+    { "id": "RD-AND-BKC", "name": "JVLR BKC Elevated Route", "source": "ANDHERI", "target": "BKC", "distance": 6.8, "travelTime": 18, "floodStreetId": "ST-BKC-01", "floodFactor": 0.03 },
+    { "id": "RD-SION-DAD", "name": "Dr. Ambedkar Road Sion-Dadar", "source": "SION", "target": "DADAR", "distance": 3.2, "travelTime": 10, "floodStreetId": "ST-MIT-01", "floodFactor": 0.09 },
+    { "id": "RD-DAD-LOW", "name": "Senapati Bapat Marg", "source": "DADAR", "target": "LOWER_PAREL", "distance": 2.4, "travelTime": 9, "floodStreetId": "ST-BKC-01", "floodFactor": 0.06 },
+    { "id": "RD-KUR-CHE", "name": "SCLR Chembur Arterial", "source": "KURLA", "target": "CHEMBUR", "distance": 2.9, "travelTime": 9, "floodStreetId": "ST-KUR-02", "floodFactor": 0.07 },
+    { "id": "RD-KUR-GHA", "name": "LBS Marg Kurla-Ghatkopar", "source": "KURLA", "target": "GHATKOPAR", "distance": 2.6, "travelTime": 8, "floodStreetId": "ST-KUR-01", "floodFactor": 0.28 },
+    { "id": "RD-GHA-AIR", "name": "Andheri-Ghatkopar Link Road", "source": "GHATKOPAR", "target": "AIRPORT", "distance": 3.8, "travelTime": 12, "floodStreetId": "ST-SAK-01", "floodFactor": 0.1 }
+  ]
+}

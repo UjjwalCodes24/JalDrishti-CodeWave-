@@ -1,0 +1,9 @@
+{
+  "streets": [
+    { "id": "ST-KUR-01", "name": "Kurla Station Road", "latitude": 19.0728, "longitude": 72.8826, "terrainZone": "T-LOW-01", "drainageNode": "MH-KUR-01", "currentWaterDepth": 8, "predictedWaterDepth": 0 },
+    { "id": "ST-KUR-02", "name": "Bail Bazar Junction", "latitude": 19.0793, "longitude": 72.8791, "terrainZone": "T-LOW-02", "drainageNode": "MH-KUR-02", "currentWaterDepth": 6, "predictedWaterDepth": 0 },
+    { "id": "ST-MIT-01", "name": "Mithi River Service Road", "latitude": 19.0661, "longitude": 72.8747, "terrainZone": "T-MOD-01", "drainageNode": "J-MIT-01", "currentWaterDepth": 4, "predictedWaterDepth": 0 },
+    { "id": "ST-SAK-01", "name": "Saki Naka Link Road", "latitude": 19.1034, "longitude": 72.8897, "terrainZone": "T-MOD-01", "drainageNode": "MH-SAK-01", "currentWaterDepth": 3, "predictedWaterDepth": 0 },
+    { "id": "ST-BKC-01", "name": "BKC Connector", "latitude": 19.0633, "longitude": 72.8681, "terrainZone": "T-HIGH-01", "drainageNode": "OUT-MIT-01", "currentWaterDepth": 1, "predictedWaterDepth": 0 }
+  ]
+}

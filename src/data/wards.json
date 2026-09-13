@@ -1,0 +1,7 @@
+[
+  { "id": "W23", "name": "Ward 23", "area": "Kurla / Mithi Basin", "risk": 87, "rainfall": 61, "drainage": 35, "status": "Critical" },
+  { "id": "W14", "name": "Ward 14", "area": "Sion East", "risk": 72, "rainfall": 48, "drainage": 52, "status": "High" },
+  { "id": "W08", "name": "Ward 08", "area": "Andheri Suburbs", "risk": 64, "rainfall": 44, "drainage": 61, "status": "High" },
+  { "id": "W31", "name": "Ward 31", "area": "Dadar West", "risk": 39, "rainfall": 28, "drainage": 78, "status": "Moderate" },
+  { "id": "W05", "name": "Ward 05", "area": "Colaba", "risk": 18, "rainfall": 12, "drainage": 91, "status": "Low" }
+]

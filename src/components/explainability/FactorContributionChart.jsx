@@ -1,0 +1,3 @@
+export default function FactorContributionChart({ factors }) {
+  return <div className="xai-factor-list">{factors.map((factor) => <div className="xai-factor" key={factor.id}><div className="xai-factor-heading"><div><span className="xai-factor-icon">{factor.icon}</span><strong>{factor.label}</strong></div><b>{factor.contribution}%</b></div><div className="xai-factor-bar"><i className={factor.impact.toLowerCase().includes('critical') ? 'critical' : factor.impact.toLowerCase().includes('high') ? 'high' : 'moderate'} style={{ width: `${factor.contribution}%` }} /></div><div className="xai-factor-meta"><span>{factor.value}</span><strong>{factor.impact}</strong></div></div>)}</div>
+}

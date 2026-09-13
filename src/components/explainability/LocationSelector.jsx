@@ -1,0 +1,3 @@
+export default function LocationSelector({ locations, selectedLocation, selectedTime, onLocationChange, onTimeChange }) {
+  return <div className="xai-selector-grid"><label><span>LOCATION / STREET</span><select value={selectedLocation} onChange={(event) => onLocationChange(event.target.value)}>{locations.map((street) => <option key={street.id} value={street.id}>{street.name}</option>)}</select></label><label><span>FORECAST HORIZON</span><select value={selectedTime} onChange={(event) => onTimeChange(event.target.value)}><option>NOW</option><option>+30 MIN</option><option>+60 MIN</option><option>+90 MIN</option><option>+120 MIN</option><option>+180 MIN</option></select></label></div>
+}

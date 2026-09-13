@@ -1,0 +1,9 @@
+{
+  "mode": "SIMULATED FLOOD-AWARE ROUTING",
+  "routeTypes": ["Emergency Vehicle", "Public Transport", "Commuter"],
+  "demonstrationPairs": [
+    { "start": "KURLA", "destination": "SION" },
+    { "start": "KURLA", "destination": "BKC" },
+    { "start": "AIRPORT", "destination": "SION" }
+  ]
+}

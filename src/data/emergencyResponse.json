@@ -1,0 +1,16 @@
+{
+  "mode": "DEMO MODE · SIMULATED DATA",
+  "resources": [
+    { "id": "D-02", "type": "Drainage response teams", "available": 3, "status": "AVAILABLE", "assignment": "Kurla Station Road" },
+    { "id": "D-04", "type": "Drainage response teams", "available": 3, "status": "DEPLOYED", "assignment": "Bail Bazar Junction" },
+    { "id": "D-07", "type": "Drainage response teams", "available": 3, "status": "EN ROUTE", "assignment": "Mithi River Service Road" },
+    { "id": "EV-02", "type": "Emergency vehicles", "available": 2, "status": "AVAILABLE", "assignment": "Safe routes verified" },
+    { "id": "P-01", "type": "Mobile pumps", "available": 2, "status": "AVAILABLE", "assignment": "Kurla Station Road" },
+    { "id": "T-01", "type": "Traffic control units", "available": 1, "status": "DEPLOYED", "assignment": "Bail Bazar diversion corridor" }
+  ],
+  "teamLocations": [
+    { "id": "D-02", "name": "Team D-02", "latitude": 19.0728, "longitude": 72.8826, "status": "AVAILABLE", "assignment": "Kurla Station Road" },
+    { "id": "D-04", "name": "Team D-04", "latitude": 19.0793, "longitude": 72.8791, "status": "DEPLOYED", "assignment": "Bail Bazar Junction" },
+    { "id": "D-07", "name": "Team D-07", "latitude": 19.0661, "longitude": 72.8747, "status": "EN ROUTE", "assignment": "Mithi River Service Road" }
+  ]
+}

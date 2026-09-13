@@ -1,0 +1,11 @@
+{
+  "alerts": [
+    { "severity": "Critical", "title": "Ward 23: flash-flood threshold likely", "detail": "Mithi Basin · onset in approximately 45 minutes", "time": "14:18 IST" },
+    { "severity": "High", "title": "Ward 14: drainage capacity falling", "detail": "Sion East · 52% capacity remaining", "time": "14:12 IST" }
+  ],
+  "actions": [
+    { "title": "Dispatch field inspection", "detail": "Send a response team to Kurla pumping station.", "owner": "Municipal control room", "status": "Ready" },
+    { "title": "Review traffic diversion", "detail": "Prepare diversion around LBS Marg low points.", "owner": "Traffic operations", "status": "Pending" },
+    { "title": "Notify ward officers", "detail": "Share the Ward 23 risk brief with local officers.", "owner": "Incident commander", "status": "Ready" }
+  ]
+}

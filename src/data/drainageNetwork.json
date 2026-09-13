@@ -1,0 +1,16 @@
+{
+  "area": "Kurla East and Mithi Basin demonstration zone",
+  "nodes": [
+    { "id": "MH-KUR-01", "name": "Kurla Station inlet", "lat": 19.0728, "lng": 72.8826, "type": "drainage inlet", "capacity": 58, "currentLoad": 39, "status": "watch" },
+    { "id": "MH-KUR-02", "name": "Bail Bazar manhole", "lat": 19.0793, "lng": 72.8791, "type": "manhole", "capacity": 44, "currentLoad": 36, "status": "watch" },
+    { "id": "J-MIT-01", "name": "Mithi junction", "lat": 19.0661, "lng": 72.8747, "type": "junction", "capacity": 72, "currentLoad": 48, "status": "normal" },
+    { "id": "MH-SAK-01", "name": "Saki Naka inlet", "lat": 19.1034, "lng": 72.8897, "type": "drainage inlet", "capacity": 66, "currentLoad": 35, "status": "normal" },
+    { "id": "OUT-MIT-01", "name": "Mithi outfall", "lat": 19.0542, "lng": 72.8617, "type": "junction", "capacity": 92, "currentLoad": 54, "status": "normal" }
+  ],
+  "edges": [
+    { "id": "P-KUR-01", "source": "MH-KUR-01", "target": "J-MIT-01", "length": 820, "diameter": 1.2, "hydraulicCapacity": 48, "currentFlow": 35, "blocked": false },
+    { "id": "P-KUR-02", "source": "MH-KUR-02", "target": "J-MIT-01", "length": 640, "diameter": 0.9, "hydraulicCapacity": 31, "currentFlow": 29, "blocked": true },
+    { "id": "P-SAK-01", "source": "MH-SAK-01", "target": "J-MIT-01", "length": 1100, "diameter": 1.4, "hydraulicCapacity": 61, "currentFlow": 27, "blocked": false },
+    { "id": "C-MIT-01", "source": "J-MIT-01", "target": "OUT-MIT-01", "length": 1350, "diameter": 1.8, "hydraulicCapacity": 82, "currentFlow": 43, "blocked": false }
+  ]
+}

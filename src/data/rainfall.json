@@ -1,0 +1,27 @@
+{
+  "area": "Kurla East and Mithi Basin demonstration zone",
+  "mode": "DEMO MODE",
+  "source": "SIMULATED DATA",
+  "sourceProfile": {
+    "provider": "IMD / Doppler Weather Radar",
+    "connection": "fallback",
+    "lastObservation": "2026-09-06T14:20:00+05:30",
+    "dataQuality": 78,
+    "radarCoverage": 64,
+    "stationCoverage": 42,
+    "observationWindow": "Last 60 minutes"
+  },
+  "observations": [
+    { "time": "-60 MIN", "intensity": 29, "quality": 74 },
+    { "time": "-30 MIN", "intensity": 35, "quality": 76 },
+    { "time": "NOW", "intensity": 42, "quality": 78 }
+  ],
+  "forecast": [
+    { "time": "NOW", "offsetMinutes": 0, "intensity": 42, "accumulated": 0, "confidence": 88 },
+    { "time": "+30 MIN", "offsetMinutes": 30, "intensity": 51, "accumulated": 21, "confidence": 86 },
+    { "time": "+60 MIN", "offsetMinutes": 60, "intensity": 63, "accumulated": 49, "confidence": 83 },
+    { "time": "+90 MIN", "offsetMinutes": 90, "intensity": 72, "accumulated": 83, "confidence": 80 },
+    { "time": "+120 MIN", "offsetMinutes": 120, "intensity": 58, "accumulated": 113, "confidence": 76 },
+    { "time": "+180 MIN", "offsetMinutes": 180, "intensity": 39, "accumulated": 162, "confidence": 70 }
+  ]
+}

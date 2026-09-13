@@ -1,0 +1,10 @@
+{
+  "area": "Kurla East and Mithi Basin demonstration zone",
+  "zones": [
+    { "id": "T-LOW-01", "name": "Kurla Station lowland", "latitude": 19.0728, "longitude": 72.8826, "elevation": 4.2, "slope": 0.7, "flowDirection": "southwest", "terrainType": "low-lying", "accumulationPotential": 0.92 },
+    { "id": "T-LOW-02", "name": "Bail Bazar depression", "latitude": 19.0793, "longitude": 72.8791, "elevation": 5.1, "slope": 1.1, "flowDirection": "south", "terrainType": "low-lying", "accumulationPotential": 0.84 },
+    { "id": "T-MOD-01", "name": "Saki Naka transition", "latitude": 19.1034, "longitude": 72.8897, "elevation": 8.8, "slope": 2.4, "flowDirection": "southwest", "terrainType": "moderate", "accumulationPotential": 0.55 },
+    { "id": "T-MOD-02", "name": "Chunabhatti shoulder", "latitude": 19.0578, "longitude": 72.872, "elevation": 10.6, "slope": 3.2, "flowDirection": "west", "terrainType": "moderate", "accumulationPotential": 0.43 },
+    { "id": "T-HIGH-01", "name": "BKC higher ground", "latitude": 19.0633, "longitude": 72.8681, "elevation": 16.8, "slope": 5.5, "flowDirection": "northwest", "terrainType": "higher", "accumulationPotential": 0.2 }
+  ]
+}

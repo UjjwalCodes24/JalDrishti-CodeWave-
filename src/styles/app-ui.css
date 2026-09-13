@@ -1,0 +1,1088 @@
+/* Application chrome and dashboard surfaces — scoped to .app-shell so the landing page is unaffected. */
+
+.app-shell {
+  --jd-navy: #16324f;
+  --jd-navy-deep: #122a43;
+  --jd-navy-mid: #1d3f63;
+  --jd-navy-soft: #8aa3bc;
+  --jd-canvas: #eef3f8;
+  --jd-card: #ffffff;
+  --jd-ink: #1b2b3c;
+  --jd-muted: #6b7c8d;
+  --jd-line: #e4ebf2;
+  --jd-teal: #0d9f7a;
+  --jd-blue: #2b7de9;
+  --jd-red: #e24b4b;
+  --jd-shadow: 0 8px 24px rgba(22, 50, 79, 0.06);
+  --jd-radius: 16px;
+  background: var(--jd-canvas);
+  color: var(--jd-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app-shell .sidebar {
+  width: 232px;
+  flex-basis: 232px;
+  min-height: 100vh;
+  padding: 22px 14px 18px;
+  background: var(--jd-navy);
+  color: #e8eef5;
+  border-right: 0;
+  box-shadow: none;
+}
+
+.app-shell .brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 28px;
+}
+
+.app-shell .brand-mark>span,
+.app-shell .brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #3ec3ff 0%, #1d8fd6 100%);
+  color: white;
+  border: 0;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.app-shell .brand-mark strong {
+  color: #ffffff;
+  font: 700 18px 'Inter', sans-serif;
+  letter-spacing: -0.3px;
+}
+
+.app-shell .brand-mark small {
+  color: #9bb3c8;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.app-shell .main-nav {
+  display: grid;
+  gap: 4px;
+}
+
+.app-shell .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 0;
+  color: #c5d4e2;
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: none;
+  transform: none;
+}
+
+.app-shell .nav-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  transform: none;
+}
+
+.app-shell .nav-link.active,
+.app-shell .nav-link:nth-child(n).active {
+  background: var(--jd-navy-mid);
+  color: #ffffff;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.app-shell .nav-icon {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.app-shell .nav-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-shell .sidebar-note {
+  margin-top: auto;
+  padding: 16px 10px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #c7d6e4;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.app-shell .sidebar-note .gov-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-shell .sidebar-note .gov-mark svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.app-shell .sidebar-note p {
+  margin: 0;
+  color: #9bb3c8;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.app-shell .sidebar-note .status-dot {
+  display: none;
+}
+
+.app-shell .main-area {
+  min-width: 0;
+  flex: 1;
+  background: var(--jd-canvas);
+}
+
+.app-shell .topbar {
+  height: auto;
+  min-height: 72px;
+  padding: 0 28px;
+  background: #f7fafc;
+  border-bottom: 1px solid var(--jd-line);
+  color: var(--jd-ink);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.app-shell .topbar-region-selector-wrapper {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-shell .topbar-kicker {
+  display: none;
+}
+
+.app-shell .location-pin {
+  width: 16px;
+  height: 16px;
+  color: var(--jd-blue);
+  flex-shrink: 0;
+}
+
+.app-shell .topbar-region-select {
+  font: 600 14px 'Inter', sans-serif;
+  color: var(--jd-ink);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7c8d' stroke-width='2.2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  padding: 4px 28px 4px 2px;
+  border-radius: 8px;
+}
+
+.app-shell .topbar-region-select:hover {
+  background-color: #eef3f8;
+  border-color: var(--jd-line);
+}
+
+.app-shell .topbar-region-select:focus-visible {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(43, 125, 233, 0.15);
+}
+
+.app-shell .topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--jd-muted);
+  font-size: 12.5px;
+}
+
+.app-shell .live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #e9f8f2;
+  color: #147a5a;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.app-shell .live-indicator .status-dot {
+  background: #22c55e;
+}
+
+.app-shell .topbar-clock {
+  color: #5d7082;
+  white-space: nowrap;
+}
+
+.app-shell .topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 6px;
+  border-left: 1px solid var(--jd-line);
+}
+
+.app-shell .topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #dbe7f4;
+  color: #245a8e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-shell .topbar-user strong,
+.app-shell .topbar-user small {
+  display: block;
+}
+
+.app-shell .topbar-user strong {
+  font-size: 13px;
+  color: var(--jd-ink);
+}
+
+.app-shell .topbar-user small {
+  font-size: 11px;
+  color: var(--jd-muted);
+  font-weight: 500;
+}
+
+.app-shell .page-content {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto;
+  /* Fix 4: Reduce bottom padding to eliminate excessive blank space before footer */
+  padding: 22px 0 8px;
+}
+
+.app-shell .page-header {
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding-bottom: 0;
+}
+
+.app-shell .page-header h1 {
+  margin: 0 0 6px;
+  font: 700 clamp(26px, 2.4vw, 32px) 'Inter', sans-serif;
+  letter-spacing: -0.6px;
+  color: var(--jd-ink);
+}
+
+.app-shell .page-header p,
+.app-shell .muted {
+  color: var(--jd-muted);
+}
+
+.app-shell .eyebrow {
+  color: #5d87b3;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.4px;
+  text-transform: none;
+}
+
+.app-shell .panel,
+.app-shell .metric-card {
+  background: var(--jd-card);
+  border: 1px solid var(--jd-line);
+  border-radius: var(--jd-radius);
+  box-shadow: var(--jd-shadow);
+}
+
+.app-shell .panel {
+  padding: 18px 20px;
+}
+
+.app-shell .panel h2 {
+  font: 700 16px 'Inter', sans-serif;
+  letter-spacing: -0.2px;
+  color: var(--jd-ink);
+}
+
+.app-shell .prototype-label {
+  border-radius: 999px;
+  border-color: var(--jd-line);
+  background: #f7fafc;
+  color: var(--jd-muted);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Fix 2: Ensure map panel heading is left-aligned (not space-between) */
+.app-shell .dashboard-map-card .panel-heading {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.app-shell .risk-badge {
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.3px;
+}
+
+.app-shell .text-link {
+  color: var(--jd-blue);
+}
+
+/* Dashboard greeting */
+.app-shell .dash-greeting {
+  margin-bottom: 16px;
+}
+
+.app-shell .dash-greeting h1 {
+  margin: 0;
+  font: 700 30px/1.15 'DM Sans', sans-serif;
+  letter-spacing: -0.7px;
+  color: var(--jd-ink);
+}
+
+.app-shell .dash-greeting p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--jd-muted);
+}
+
+.app-shell .header-status-indicator {
+  display: none;
+}
+
+.app-shell .dashboard-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #f3d4d0;
+  border-left: 4px solid var(--jd-red);
+  border-radius: 12px;
+  background: #fff8f7;
+}
+
+.app-shell .status-banner-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #b4534a;
+}
+
+.app-shell .status-banner-badge {
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-shell .status-banner-telemetry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.app-shell .telemetry-label {
+  display: block;
+  font-size: 11px;
+  color: var(--jd-muted);
+}
+
+.app-shell .telemetry-value {
+  font-size: 13px;
+  color: var(--jd-ink);
+}
+
+.app-shell .action-link-btn {
+  border-radius: 999px;
+  background: white;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* KPI row */
+.app-shell .situation-summary-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.app-shell .situation-card {
+  min-height: 132px;
+  padding: 14px 16px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--jd-line);
+  box-shadow: var(--jd-shadow);
+  background: white;
+}
+
+.app-shell .situation-card:hover {
+  transform: translateY(-1px);
+}
+
+.app-shell .kpi-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.app-shell .kpi-card-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #5d7082;
+}
+
+.app-shell .kpi-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.app-shell .kpi-icon.rain {
+  background: #e8f3fc;
+}
+
+.app-shell .kpi-icon.risk {
+  background: #fdecec;
+}
+
+.app-shell .kpi-icon.drain {
+  background: #e8f6fb;
+}
+
+.app-shell .kpi-icon.roads {
+  background: #eaf7ef;
+}
+
+.app-shell .kpi-icon.area {
+  background: #fdecec;
+}
+
+.app-shell .kpi-card-value strong {
+  font: 700 26px/1.05 'DM Sans', sans-serif;
+  letter-spacing: -0.6px;
+}
+
+.app-shell .situation-card:last-child .kpi-card-value strong {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.app-shell .kpi-card-unit {
+  font-size: 13px;
+}
+
+.app-shell .kpi-spark {
+  width: 72px;
+  height: 28px;
+  margin-left: auto;
+}
+
+.app-shell .kpi-card-status {
+  font-size: 12.5px;
+  color: #5d7082;
+}
+
+.app-shell .kpi-card-footer {
+  border-top: 0;
+  padding-top: 8px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.app-shell .ops-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.86fr);
+  gap: 14px;
+  margin-bottom: 16px;
+  align-items: start;
+}
+
+.app-shell .ops-main,
+.app-shell .ops-aside {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.app-shell .dashboard-monitor-grid {
+  display: contents;
+}
+
+.app-shell .dashboard-map-card,
+.app-shell .priority-alerts-card,
+.app-shell .dashboard-forecast-panel,
+.app-shell .attention-card,
+.app-shell .updates-card,
+.app-shell .safe-route-card,
+.app-shell .emergency-glance-card {
+  margin: 0;
+  border-radius: var(--jd-radius);
+  box-shadow: var(--jd-shadow);
+}
+
+.app-shell .dashboard-map-card {
+  padding: 16px 16px 12px;
+}
+
+.app-shell .dashboard-map-card .panel-heading h2 {
+  font-size: 16px;
+  margin: 0 0 2px;
+}
+
+.app-shell .dashboard-map-hero,
+.app-shell .dashboard-map-hero .leaflet-map-wrap,
+.app-shell .dashboard-map-hero .leaflet-map {
+  min-height: 400px;
+  height: 400px;
+  border-radius: 12px;
+}
+
+.app-shell .dashboard-map-hero .leaflet-control-zoom {
+  top: 12px;
+  left: 12px;
+  border-radius: 8px !important;
+}
+
+.app-shell .map-live-chip {
+  background: #e9f8f2;
+  border-color: #c7eedd;
+  color: #147a5a;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+}
+
+.app-shell .map-glass {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.app-shell .map-status-overlay {
+  display: none;
+}
+
+.app-shell .dashboard-map-footer {
+  display: none;
+}
+
+.app-shell .priority-alerts-header h2 {
+  font-size: 16px;
+}
+
+.app-shell .priority-alerts-subtitle {
+  display: none;
+}
+
+.app-shell .alert-count-badge {
+  background: #fdecec;
+  color: var(--jd-red);
+  border: 0;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+}
+
+.app-shell .alerts-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-shell .view-all-link {
+  color: var(--jd-blue);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.app-shell .dashboard-alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: none;
+}
+
+.app-shell .dashboard-alert:before {
+  display: none;
+}
+
+.app-shell .dashboard-alert.priority-highest {
+  background: #fffafa;
+}
+
+.app-shell .alert-depth-stat {
+  order: 0;
+}
+
+.app-shell .alert-locate-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: #5d87b3;
+}
+
+.app-shell .priority-alerts-footer {
+  display: none;
+}
+
+.app-shell .attention-card,
+.app-shell .updates-card {
+  padding: 16px 18px;
+}
+
+.app-shell .attention-card h2,
+.app-shell .updates-card h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.app-shell .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.app-shell .attention-list,
+.app-shell .updates-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-shell .attention-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--jd-ink);
+}
+
+.app-shell .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.app-shell .dot.red {
+  background: #ef4444;
+}
+
+.app-shell .dot.amber {
+  background: #f59e0b;
+}
+
+.app-shell .dot.green {
+  background: #22c55e;
+}
+
+.app-shell .updates-list li {
+  display: grid;
+  grid-template-columns: 8px 1fr;
+  gap: 2px 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--jd-line);
+}
+
+.app-shell .updates-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.app-shell .updates-list strong {
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.app-shell .updates-list span {
+  grid-column: 2;
+  font-size: 12px;
+  color: var(--jd-muted);
+}
+
+.app-shell .dashboard-forecast-panel {
+  padding: 14px 14px;
+}
+
+.app-shell .forecast-panel-heading {
+  /* Fix 3 & Fix 2: align heading icon+text to the left, not space-between */
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px !important;
+}
+
+.app-shell .forecast-panel-heading>div:first-child {
+  /* icon box */
+  flex-shrink: 0;
+}
+
+.app-shell .forecast-panel-heading>div:last-child {
+  /* text block — left-align it */
+  text-align: left;
+  flex: 1;
+}
+
+.app-shell .forecast-panel-heading h2 {
+  font-size: 16px;
+}
+
+.app-shell .forecast-horizon-controls {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.app-shell .forecast-panel-heading .see-forecast-link {
+  margin-left: auto;
+}
+
+.app-shell .see-forecast-link {
+  color: var(--jd-blue);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Fix 3: Make all 6 forecast columns fully visible — use minmax with smaller min */
+.app-shell .forecast-timeline-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  margin-bottom: 0;
+  overflow: visible;
+}
+
+/* Fix 3: Reduce per-step padding so 6 columns fit at desktop widths */
+.app-shell .forecast-timeline-step {
+  border-radius: 12px;
+  border-left-width: 1px;
+  padding: 10px 8px !important;
+  min-width: 0;
+  background: #f8fbfd;
+}
+
+.app-shell .timeline-step-header {
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+.app-shell .timeline-step-time {
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.app-shell .forecast-risk-tag {
+  font-size: 9px !important;
+  padding: 1px 5px !important;
+  white-space: nowrap;
+}
+
+.app-shell .timeline-metric-label {
+  font-size: 10px !important;
+}
+
+.app-shell .timeline-metric-val {
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.app-shell .timeline-metric-row {
+  padding: 3px 5px !important;
+  gap: 3px !important;
+}
+
+.app-shell .forecast-timeline-step.selected {
+  background: #eef6ff;
+  border-color: #bfd6f5;
+  border-left-color: #bfd6f5 !important;
+}
+
+.app-shell .timeline-step-stage {
+  display: none;
+}
+
+.app-shell .forecast-selected-summary {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--jd-line);
+}
+
+.app-shell .selected-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.app-shell .summary-stat-box {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8fbfd;
+  border: 1px solid var(--jd-line);
+}
+
+.app-shell .ops-bottom {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 14px;
+}
+
+.app-shell .safe-route-card h2,
+.app-shell .emergency-glance-card h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.app-shell .safe-route-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.app-shell .safe-route-meta strong {
+  display: block;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+}
+
+.app-shell .safe-route-meta span {
+  font-size: 11.5px;
+  color: var(--jd-muted);
+}
+
+.app-shell .view-safe-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: var(--jd-teal);
+  color: white;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.app-shell .view-safe-btn:hover {
+  filter: brightness(0.96);
+}
+
+.app-shell .emergency-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.app-shell .emergency-stat {
+  padding: 12px;
+  border-radius: 12px;
+  background: #fff6f4;
+}
+
+.app-shell .emergency-stat.amber {
+  background: #fff7ed;
+}
+
+.app-shell .emergency-stat.blue {
+  background: #eef6ff;
+}
+
+.app-shell .emergency-stat.green {
+  background: #eef8f2;
+}
+
+.app-shell .emergency-stat strong {
+  display: block;
+  font-size: 22px;
+}
+
+.app-shell .emergency-stat span {
+  font-size: 12px;
+  color: var(--jd-muted);
+}
+
+.app-shell .ai-situation-insight,
+.app-shell .quick-modules-section,
+.app-shell .data-sources-panel {
+  margin-bottom: 16px;
+  border-radius: var(--jd-radius);
+}
+
+.app-shell .quick-module {
+  border-radius: 14px;
+  border-top-width: 1px;
+  min-height: 118px;
+}
+
+.app-shell .data-sources-panel {
+  display: block;
+}
+
+.app-shell .dashboard-footer {
+  border-top-color: var(--jd-line);
+  /* Fix 4: Minimal margin so footer sits naturally below forecast */
+  margin-top: 10px !important;
+}
+
+.app-shell .button,
+.app-shell .danger-button,
+.app-shell .outline-button,
+.app-shell .secondary-btn {
+  border-radius: 10px;
+}
+
+.app-shell .metric-grid,
+.app-shell .response-summary-grid,
+.app-shell .nowcast-impact-strip {
+  gap: 12px;
+}
+
+.app-shell .metric-card,
+.app-shell .response-summary-card {
+  border-radius: 14px;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .situation-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .app-shell .ops-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Keep all 6 forecast columns at this breakpoint — they still fit */
+}
+
+@media (max-width: 900px) {
+  .app-shell .sidebar {
+    width: 210px;
+    flex-basis: 210px;
+  }
+
+  .app-shell .page-content {
+    width: calc(100% - 32px);
+  }
+
+  .app-shell .ops-bottom,
+  .app-shell .situation-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app-shell .topbar-user small {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    display: block;
+  }
+
+  .app-shell .sidebar {
+    width: 100%;
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .app-shell .brand-mark {
+    padding-bottom: 10px;
+  }
+
+  .app-shell .main-nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+  }
+
+  .app-shell .nav-link {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .app-shell .sidebar-note {
+    display: none;
+  }
+
+  .app-shell .topbar {
+    height: auto;
+    min-height: 58px;
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .app-shell .topbar-user {
+    display: none;
+  }
+
+  .app-shell .page-content {
+    width: calc(100% - 24px);
+    padding-top: 16px;
+  }
+
+  .app-shell .situation-summary-grid,
+  .app-shell .ops-bottom,
+  .app-shell .safe-route-meta,
+  .app-shell .emergency-stats {
+    grid-template-columns: 1fr;
+  }
+
+  /* At smallest breakpoints, collapse forecast to 2 columns for readability */
+  .app-shell .forecast-timeline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell .dash-greeting h1 {
+    font-size: 24px;
+  }
+
+  .app-shell .selected-summary-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app-shell .dashboard-map-hero,
+  .app-shell .dashboard-map-hero .leaflet-map-wrap,
+  .app-shell .dashboard-map-hero .leaflet-map {
+    min-height: 280px;
+    height: 280px;
+  }
+
+  .app-shell .dashboard-status-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

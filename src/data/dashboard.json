@@ -1,0 +1,20 @@
+{
+  "isPrototype": true,
+  "location": "Mumbai Metropolitan Area",
+  "lastUpdated": "04 Sep 2026, 14:20 IST",
+  "metrics": [
+    { "label": "Current rainfall", "value": "42", "unit": "mm/h", "note": "IMD radar composite" },
+    { "label": "3-hour forecast", "value": "58", "unit": "mm/h", "note": "Nowcast estimate" },
+    { "label": "High-risk wards", "value": "3", "unit": "wards", "note": "Require monitoring", "tone": "warning" },
+    { "label": "Active alerts", "value": "2", "unit": "alerts", "note": "Response in progress", "tone": "danger" }
+  ],
+  "priorityWard": {
+    "name": "Ward 23",
+    "area": "Kurla / Mithi Basin",
+    "risk": 87,
+    "level": "Critical",
+    "rainfall": "61 mm/h",
+    "drainage": "35% capacity",
+    "onset": "~45 min"
+  }
+}

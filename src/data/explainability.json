@@ -1,0 +1,10 @@
+{
+  "confidence": 82,
+  "modelVersion": "Prototype model v0.4",
+  "factors": [
+    { "label": "Rainfall intensity", "value": 34, "detail": "61 mm/h observed in the priority ward", "tone": "danger" },
+    { "label": "Drainage capacity", "value": 27, "detail": "Available capacity estimated at 35%", "tone": "warning" },
+    { "label": "Low-lying terrain", "value": 18, "detail": "Mithi Basin catchment exposure", "tone": "teal" },
+    { "label": "Soil saturation", "value": 8, "detail": "Antecedent rainfall over the past 24 hours", "tone": "aqua" }
+  ]
+}
