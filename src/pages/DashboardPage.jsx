@@ -303,6 +303,100 @@ function DashboardPage() {
               })}
             </div>
           </Panel>
+
+          {/* Flood Intelligence Summary — fills the left-column gap */}
+          {(() => {
+            const topStreet = sortedStreets[0]
+            if (!topStreet) return null
+
+            const drainagePct = Math.round(prediction.drainage.utilization * 100)
+            const drainageColor = drainagePct >= 150 ? '#ef4444' : drainagePct >= 100 ? '#f59e0b' : '#14b8a6'
+
+            // Find the forecast horizon with peak water depth
+            const peakPoint = forecast.reduce((best, pt) => pt.highestWaterDepth > best.highestWaterDepth ? pt : best, forecast[0])
+            const timeToPeak = peakPoint?.time === 'NOW' ? 'At peak now' : peakPoint?.time || 'N/A'
+
+            const depthColor = topStreet.waterDepth >= 50 ? '#ef4444' : topStreet.waterDepth >= 30 ? '#f59e0b' : '#14b8a6'
+
+            // Top 3 risk driver labels from the explainability already computed
+            const driverLabels = topDrivers.slice(0, 3).map(f => f.label.toLowerCase())
+            const reasonText = driverLabels.length >= 3
+              ? `${driverLabels[0]}, ${driverLabels[1]}, and ${driverLabels[2]} are the primary drivers combining to intensify surface water accumulation at this horizon.`
+              : explainability.explanation
+
+            return (
+              <Panel style={{ padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>🔎</span>
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', letterSpacing: '0.5px', textTransform: 'uppercase', display: 'block' }}>Priority Zone Analysis</span>
+                      <h2 style={{ fontSize: '15px', margin: 0, fontWeight: 700, color: '#1e293b' }}>Flood Intelligence Summary</h2>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#ef4444', background: '#fee2e2', padding: '3px 9px', borderRadius: '4px' }}>
+                    {selectedTime === 'NOW' ? 'LIVE' : selectedTime}
+                  </span>
+                </div>
+
+                {/* Highest risk zone */}
+                <div style={{ padding: '14px', borderRadius: '8px', border: '1px solid #fecaca', background: '#fffafa', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>Highest Risk Zone</span>
+                  <strong style={{ fontSize: '14px', color: '#1e293b', display: 'block', marginBottom: '2px' }}>{topStreet.name}</strong>
+                  <span style={{ fontSize: '22px', fontWeight: 800, color: depthColor }}>{topStreet.waterDepth} cm</span>
+                  <span style={{ fontSize: '12px', color: '#64748b', marginLeft: '6px' }}>predicted depth</span>
+                </div>
+
+                {/* 4-stat grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
+                  <div style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '4px' }}>Time to Peak</span>
+                    <strong style={{ fontSize: '15px', color: '#1e293b' }}>{timeToPeak}</strong>
+                  </div>
+                  <div style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '4px' }}>Drainage Status</span>
+                    <strong style={{ fontSize: '15px', color: drainageColor }}>{drainagePct}% capacity</strong>
+                  </div>
+                  <div style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '4px' }}>Rainfall Now</span>
+                    <strong style={{ fontSize: '15px', color: '#1e293b' }}>{prediction.intensity} mm/hr</strong>
+                  </div>
+                  <div style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '4px' }}>Affected Roads</span>
+                    <strong style={{ fontSize: '15px', color: '#1e293b' }}>{affectedRoads} sectors</strong>
+                  </div>
+                </div>
+
+                {/* Risk driver summary */}
+                <div style={{ padding: '12px', borderRadius: '8px', background: '#f0f9ff', border: '1px solid #bae6fd', marginBottom: '14px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '6px' }}>Why This Zone Is At Risk</span>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#1e293b', lineHeight: 1.55 }}>{reasonText}</p>
+                </div>
+
+                {/* Top drivers bar */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px' }}>
+                  {topDrivers.slice(0, 3).map((factor) => (
+                    <div key={factor.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '11px' }}>
+                      <span style={{ width: '130px', color: '#475569', flexShrink: 0 }}>{factor.label}</span>
+                      <div style={{ flex: 1, height: '5px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ width: `${factor.contribution}%`, height: '100%', background: factor.contribution >= 22 ? '#ef4444' : factor.contribution >= 14 ? '#f59e0b' : '#14b8a6', borderRadius: '3px', transition: 'width 0.4s ease' }} />
+                      </div>
+                      <span style={{ width: '32px', textAlign: 'right', fontWeight: 700, color: '#1e293b', flexShrink: 0 }}>{factor.contribution}%</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <Link
+                  to="/explainable-ai"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', color: '#3b82f6', fontSize: '12px', fontWeight: 700, textDecoration: 'none' }}
+                >
+                  View Full Explainable Analysis →
+                </Link>
+              </Panel>
+            )
+          })()}
         </div>
 
         <div className="ops-aside" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
