@@ -6,7 +6,12 @@ export const RegionContext = createContext({
   setSelectedRegion: () => {},
   currentRegion: getRegionConfig(DEFAULT_REGION_ID),
   regions: REGION_LIST,
-  isDemoMode: true
+  isDemoMode: true,
+  selectedHorizon: 'NOW',
+  setSelectedHorizon: () => {},
+  selectedStreetId: '',
+  setSelectedStreetId: () => {},
+  setIncidentContext: () => {},
 })
 
 export default RegionContext

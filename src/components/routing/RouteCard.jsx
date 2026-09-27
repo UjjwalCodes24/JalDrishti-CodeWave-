@@ -1,105 +1,190 @@
-import { Panel, RiskBadge } from '../ui'
+import { Panel } from '../ui'
 
-export default function RouteCard({ route, tone }) {
+/**
+ * Professional Municipal Route Card
+ * Implements Section 9, 10, 12: Route Comparison, Route Safety Explanation, Shortest vs Flood-Exposure
+ */
+export default function RouteCard({
+  route,
+  index = 0,
+  isSelected = false,
+  onSelect,
+  isShortest = false,
+  isLowerExposure = false,
+}) {
   if (!route) {
     return (
-      <Panel className={`route-card route-unavailable route-${tone}`}>
-        <span className="route-card-kicker">
-          {tone === 'recommended' ? 'NO PASSABLE ROUTE' : tone === 'alternative' ? 'NO ALTERNATIVE ROUTE' : 'NO ROUTE AVAILABLE'}
-        </span>
-        <h3>All evaluated routes contain critical flood exposure or blocked road segments.</h3>
-        <p className="route-unavailable-desc">Try selecting an alternative departure time or adjusting destination coordinates.</p>
+      <Panel className="route-card route-unavailable">
+        <span className="route-card-kicker">EVALUATING ROUTE ALTERNATIVE</span>
+        <h3>No viable route corridor identified for this parameter set.</h3>
+        <p className="route-unavailable-desc">
+          Predicted flood depths along direct corridors exceed passable vehicle thresholds.
+        </p>
       </Panel>
     )
   }
 
-  const badgeLevel =
-    route.safetyRating === 'SAFE'
-      ? 'Low'
-      : route.safetyRating === 'MODERATE' || route.safetyRating === 'PASSABLE' || route.safetyRating === 'CAUTION'
-        ? 'Moderate'
-        : 'Critical'
+  // Derive Route Status strictly as per requirement 9:
+  // LOWER FLOOD EXPOSURE / ELEVATED FLOOD EXPOSURE / HIGH FLOOD EXPOSURE
+  const maxDepth = route.maximumWaterDepth ?? route.floodDepth ?? 0
+  const blockedCount = route.blockedSegments ?? route.blockedRoads ?? 0
+  const floodedCount = route.floodedSegments ?? 0
 
-  const cardTone =
-    tone === 'recommended'
-      ? 'recommended'
-      : tone === 'alternative'
-        ? 'alternative'
-        : 'shortest'
+  let routeStatus = 'ELEVATED FLOOD EXPOSURE'
+  let statusTone = 'warning'
 
-  const scoreColor =
-    route.safetyScore >= 80 ? '#10b981' : route.safetyScore >= 60 ? '#f59e0b' : '#ef4444'
+  if (maxDepth < 15 && blockedCount === 0 && floodedCount === 0) {
+    routeStatus = 'LOWER FLOOD EXPOSURE'
+    statusTone = 'safe'
+  } else if (maxDepth >= 30 || blockedCount > 0 || route.floodExposure === 'CRITICAL') {
+    routeStatus = 'HIGH FLOOD EXPOSURE'
+    statusTone = 'danger'
+  } else {
+    routeStatus = 'ELEVATED FLOOD EXPOSURE'
+    statusTone = 'warning'
+  }
 
-  const highlights = Array.isArray(route.highlights) ? route.highlights : []
+  // Factual reasons based on calculated data (Section 10)
+  const formattedDepth = typeof maxDepth === 'number' ? Number(maxDepth.toFixed(1)) : maxDepth
+  const factualReasons = []
+  if (isLowerExposure || maxDepth < 15) {
+    factualReasons.push('Lower predicted flood exposure across evaluated corridor.')
+  }
+  if (blockedCount === 0) {
+    factualReasons.push('Avoids modeled high-risk road segments.')
+  } else {
+    factualReasons.push(`Contains ${blockedCount} impassable road segment(s) with severe predicted depth.`)
+  }
+  if (maxDepth > 0) {
+    factualReasons.push(`Maximum predicted depth reaches ${formattedDepth} cm.`)
+  } else {
+    factualReasons.push('Zero predicted standing water along this alignment.')
+  }
+  if (route.drainageRisk === 'Low') {
+    factualReasons.push('Reduced exposure to overloaded drainage corridors.')
+  } else if (route.drainageRisk === 'Elevated') {
+    factualReasons.push('Elevated exposure to surcharging drainage nodes.')
+  }
+  if (isShortest) {
+    factualReasons.push(`Shortest direct distance (${route.distance} km, ${route.travelTime} min travel time).`)
+  }
 
   return (
-    <Panel className={`route-card route-${cardTone}`}>
+    <Panel
+      className={`route-card ${isSelected ? 'selected' : ''} ${
+        isLowerExposure ? 'card-lower-exposure' : isShortest ? 'card-shortest' : ''
+      }`}
+      onClick={() => onSelect && onSelect(route)}
+    >
+      {/* Route header with distinction (Section 12) */}
       <div className="route-card-heading">
         <div>
-          <span className="route-card-kicker">
-            {cardTone === 'recommended' ? '🟢 RECOMMENDED CORRIDOR' : cardTone === 'alternative' ? '🟡 ALTERNATIVE OPTION' : '🔴 SHORTEST / RISK PROFILE'}
-          </span>
-          <h3 className="route-card-title">{route.name}</h3>
+          <div className="route-tags-row">
+            <span className="route-num-badge">ROUTE {index + 1}</span>
+            {isShortest && <span className="route-distinction-tag shortest">SHORTEST ROUTE</span>}
+            {isLowerExposure && (
+              <span className="route-distinction-tag lower-exposure">LOWER PREDICTED FLOOD EXPOSURE</span>
+            )}
+            {!isShortest && !isLowerExposure && (
+              <span className="route-distinction-tag alternative">ALTERNATIVE CORRIDOR</span>
+            )}
+          </div>
+          <h3 className="route-card-title">{route.name || `Route Alternative ${index + 1}`}</h3>
         </div>
-        <RiskBadge level={badgeLevel} />
+
+        {/* Route Status Badge (Section 9) */}
+        <span className={`route-status-pill status-${statusTone}`}>{routeStatus}</span>
       </div>
 
+      {/* Required operational metrics grid (Section 9) */}
       <div className="route-stat-grid">
         <div className="stat-box">
-          <strong style={{ color: scoreColor }}>{route.safetyScore}/100</strong>
-          <span>Safety score</span>
+          <span className="stat-label">DISTANCE</span>
+          <strong className="stat-value">{route.distance} km</strong>
         </div>
         <div className="stat-box">
-          <strong>{route.distance} km</strong>
-          <span>Distance</span>
+          <span className="stat-label">TRAVEL TIME</span>
+          <strong className="stat-value">{route.travelTime} min</strong>
         </div>
         <div className="stat-box">
-          <strong>{route.travelTime} min</strong>
-          <span>Est. travel time</span>
-        </div>
-        <div className="stat-box">
-          <strong style={{ color: route.maximumWaterDepth >= 30 ? '#ef4444' : route.maximumWaterDepth >= 15 ? '#f59e0b' : '#10b981' }}>
-            {route.maximumWaterDepth} cm
+          <span className="stat-label">JALDRISHTI FLOOD EXPOSURE</span>
+          <strong
+            className="stat-value"
+            style={{
+              color:
+                route.floodExposure === 'CRITICAL'
+                  ? '#dc2626'
+                  : route.floodExposure === 'HIGH'
+                  ? '#ea580c'
+                  : route.floodExposure === 'MODERATE'
+                  ? '#d97706'
+                  : '#059669',
+            }}
+          >
+            {route.floodExposure || 'LOW'}
           </strong>
-          <span>Max water depth</span>
+        </div>
+        <div className="stat-box">
+          <span className="stat-label">MAX PREDICTED DEPTH</span>
+          <strong
+            className="stat-value"
+            style={{ color: maxDepth >= 30 ? '#dc2626' : maxDepth >= 15 ? '#ea580c' : '#1e293b' }}
+          >
+            {formattedDepth} cm
+          </strong>
+        </div>
+        <div className="stat-box">
+          <span className="stat-label">FLOODED / HIGH-RISK SEGMENTS</span>
+          <strong
+            className="stat-value"
+            style={{ color: blockedCount > 0 ? '#dc2626' : floodedCount > 0 ? '#ea580c' : '#1e293b' }}
+          >
+            {floodedCount} flooded / {blockedCount} critical
+          </strong>
+        </div>
+        <div className="stat-box">
+          <span className="stat-label">DRAINAGE RISK</span>
+          <strong
+            className="stat-value"
+            style={{ color: route.drainageRisk === 'Elevated' ? '#ea580c' : '#059669' }}
+          >
+            {route.drainageRisk || 'Low'}
+          </strong>
         </div>
       </div>
 
-      {highlights.length > 0 && (
-        <ul className="route-highlights-list">
-          {highlights.map((item, idx) => (
-            <li key={idx} className={item.startsWith('✓') ? 'highlight-good' : item.startsWith('⛔') ? 'highlight-danger' : 'highlight-warn'}>
-              {item}
-            </li>
+      {/* Section 10: Factual Route Explanation */}
+      <div className="route-explanation-box">
+        <span className="route-explanation-title">WHY THIS ROUTE?</span>
+        <ul className="route-explanation-list">
+          {factualReasons.map((reason, idx) => (
+            <li key={idx}>{reason}</li>
           ))}
         </ul>
-      )}
-
-      <div className="route-card-footer">
-        <span>{route.roadsAvoided || 0} flooded zones avoided</span>
-        <span>{route.blockedSegments || 0} blocked roads</span>
       </div>
 
-      {route.reason && <p className="route-reason">{route.reason}</p>}
-
-      {route.googleMapsUrl && (
-        <div className="route-card-actions">
+      {/* Action / Google Maps Integration */}
+      <div className="route-card-actions" onClick={(e) => e.stopPropagation()}>
+        {route.googleMapsUrl ? (
           <a
-            className={`route-nav-btn ${cardTone === 'recommended' ? 'primary-nav' : 'secondary-nav'}`}
+            className="route-nav-btn"
             href={route.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            title="Open turn-by-turn navigation in Google Maps"
+            title="Open real-world turn-by-turn navigation in Google Maps"
           >
-            <span>OPEN IN GOOGLE MAPS</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
-            </svg>
+            <span>OPEN IN GOOGLE MAPS →</span>
           </a>
-        </div>
-      )}
+        ) : null}
+
+        <button
+          type="button"
+          className={`route-select-btn ${isSelected ? 'active' : ''}`}
+          onClick={() => onSelect && onSelect(route)}
+        >
+          {isSelected ? '✓ SELECTED ON MAP' : 'INSPECT ON MAP'}
+        </button>
+      </div>
     </Panel>
   )
 }

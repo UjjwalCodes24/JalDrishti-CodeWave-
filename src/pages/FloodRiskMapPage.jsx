@@ -7,8 +7,14 @@ import terrainData from '../data/terrain.json'
 import drainageNetworkData from '../data/drainageNetwork.json'
 import InteractiveRiskMap from '../components/InteractiveRiskMap'
 import CoupledFloodEngine from '../components/CoupledFloodEngine'
+import WorkflowIndicator from '../components/workflow/WorkflowIndicator'
 import { getFloodForecast, getFloodPrediction } from '../services/floodEngine'
 import { PageHeader, Panel, RiskBadge } from '../components/ui'
+
+function fmtDepth(v) {
+  const n = Number(v)
+  return isNaN(n) ? '—' : Number(n.toFixed(1))
+}
 
 function getStreetStatus(depth) {
   if (depth >= 30) return 'Closed'
@@ -52,6 +58,7 @@ function FloodRiskMapPage() {
         description={`Street-level flood accumulation coupled to a prototype rainfall, terrain and drainage model for ${currentRegion?.name || 'the selected region'}.`}
         action={<span className="prototype-label">DEMO MODE · SIMULATED DATA</span>}
       />
+      <WorkflowIndicator currentStage="IDENTIFY" style={{ marginBottom: '14px' }} />
       <CoupledFloodEngine
         prediction={prediction}
         forecast={forecast}
@@ -66,7 +73,7 @@ function FloodRiskMapPage() {
           <div className="panel-heading">
             <div>
               <h2>Coupled risk surface</h2>
-              <p className="muted">{prediction.time} · {prediction.intensity} mm/hr · {prediction.highestWaterDepth} cm highest predicted depth</p>
+              <p className="muted">{prediction.time} · {prediction.intensity} mm/hr · {fmtDepth(prediction.highestWaterDepth)} cm highest predicted depth</p>
             </div>
             <label className="ward-filter">
               <span>Focus ward</span>
@@ -124,7 +131,7 @@ function FloodRiskMapPage() {
               <strong>{street.name}</strong>
               <span>{street.terrain.terrainType} · {street.terrain.elevation} m</span>
               <div className="depth-cell">
-                <strong>{street.waterDepth} cm</strong>
+                <strong>{fmtDepth(street.waterDepth)} cm</strong>
                 <span className="depth-bar"><i style={{ width: `${Math.min(100, street.waterDepth)}%` }} /></span>
               </div>
               <RiskBadge level={street.risk} />

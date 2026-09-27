@@ -11,6 +11,7 @@ import ExplainableAIPage from './pages/ExplainableAIPage'
 import EmergencyResponsePage from './pages/EmergencyResponsePage'
 import SafeRoutePage from './pages/SafeRoutePage'
 import LandingPage from './pages/LandingPage'
+import DataModelStatusPage from './pages/DataModelStatusPage'
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
             <Route path="/nowcast" element={<AINowcastPage />} />
             <Route path="/explainable-ai" element={<ExplainableAIPage />} />
             <Route path="/emergency-response" element={<EmergencyResponsePage />} />
+            <Route path="/data-status" element={<DataModelStatusPage />} />
+            <Route path="/data-model-status" element={<DataModelStatusPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
@@ -32,4 +35,4 @@ function App() {
   )
 }
 
-export default App
+export default App

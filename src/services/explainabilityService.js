@@ -31,13 +31,13 @@ export function normalizeRiskFactors(street, prediction) {
 export function calculateFactorContributions(street, prediction) {
   const values = normalizeRiskFactors(street, prediction)
   const definitions = [
-    { id: 'rainfall', label: 'Rainfall intensity', icon: '🌧', value: `${prediction.intensity} mm/hr`, weight: 1.15 },
-    { id: 'runoff', label: 'Surface runoff', icon: '🏙', value: `${Math.round(values.runoff * 100)}% response`, weight: 1 },
-    { id: 'elevation', label: 'Low elevation', icon: '⛰', value: `${street.terrain.elevation} m`, weight: .8 },
-    { id: 'accumulation', label: 'Slope / accumulation', icon: '📐', value: `${Math.round(values.accumulation * 100)}% potential`, weight: .85 },
-    { id: 'drainage', label: 'Drainage utilization', icon: '🚇', value: `${Math.round(values.drainage * 100)}% utilization`, weight: 1.2 },
-    { id: 'blockage', label: 'Blockage / overload', icon: '⚠', value: `${getLocationDrainage(street, prediction).blockedEdges.length} blocked local edges`, weight: 1 },
-    { id: 'backflow', label: 'Backflow risk', icon: '🌊', value: `${percent(values.backflow)} probability`, weight: .95 },
+    { id: 'rainfall', label: 'Rainfall intensity', icon: 'RF', value: `${prediction.intensity} mm/hr`, weight: 1.15 },
+    { id: 'runoff', label: 'Surface runoff', icon: 'RO', value: `${Math.round(values.runoff * 100)}% response`, weight: 1 },
+    { id: 'elevation', label: 'Terrain elevation', icon: 'EL', value: `${street.terrain.elevation} m`, weight: .8 },
+    { id: 'accumulation', label: 'Terrain accumulation', icon: 'AC', value: `${Math.round(values.accumulation * 100)}% potential`, weight: .85 },
+    { id: 'drainage', label: 'Drainage utilization', icon: 'DR', value: `${Math.round(values.drainage * 100)}% utilization`, weight: 1.2 },
+    { id: 'blockage', label: 'Blockage / overload', icon: 'BK', value: `${getLocationDrainage(street, prediction).blockedEdges.length} blocked local edges`, weight: 1 },
+    { id: 'backflow', label: 'Backflow risk', icon: 'BF', value: `${percent(values.backflow)} probability`, weight: .95 },
   ]
   const total = definitions.reduce((sum, factor) => sum + values[factor.id] * factor.weight, 0) || 1
   const calculated = definitions.map((factor) => ({ ...factor, normalized: values[factor.id], contribution: Math.round(values[factor.id] * factor.weight / total * 100) })).sort((a, b) => b.contribution - a.contribution)

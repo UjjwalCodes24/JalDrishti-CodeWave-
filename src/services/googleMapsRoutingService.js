@@ -1,5 +1,5 @@
-import { getFloodPrediction } from './floodEngine'
-import { calculateSafeRoute, resolveRoadLocationIds, getRoadLocations, getRoutingGeocodeSuffix } from './routingService'
+import { getFloodPrediction } from './floodEngine.js'
+import { calculateSafeRoute, resolveRoadLocationIds, getRoadLocations, getRoutingGeocodeSuffix } from './routingService.js'
 import { DEFAULT_REGION_ID, getRegionConfig, resolveRegionId } from '../data/regions/index.js'
 
 const travelModeMap = {
@@ -29,7 +29,7 @@ function clamp(value, min, max) {
 }
 
 export function getGoogleMapsApiKey() {
-  return import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+  return import.meta?.env?.VITE_GOOGLE_MAPS_API_KEY || ''
 }
 
 export function buildGoogleMapsDirectionsUrl(origin, destination, travelMode = 'Emergency Vehicle', regionId = DEFAULT_REGION_ID) {

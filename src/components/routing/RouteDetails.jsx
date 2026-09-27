@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Panel } from '../ui'
 
 export default function RouteDetails({ routingResult }) {
@@ -28,7 +29,7 @@ export default function RouteDetails({ routingResult }) {
 
       {affected.length === 0 ? (
         <p className="route-clear">
-          ✓ All evaluated road segments are clear and open for travel at this forecast time.
+          All evaluated road segments are clear and open for travel at this forecast time.
         </p>
       ) : (
         <div className="road-condition-list">
@@ -37,15 +38,22 @@ export default function RouteDetails({ routingResult }) {
               className={`road-condition ${segment.status.toLowerCase()}`}
               key={segment.id || `affected-${idx}`}
             >
-              <div>
+              <div style={{ flex: 1 }}>
                 <strong>{segment.name}</strong>
                 <span>
                   Status: {segment.status} · {segment.floodDepth} cm predicted water depth
                 </span>
               </div>
-              <b aria-hidden="true">
-                {segment.status === 'BLOCKED' ? '⛔' : segment.status === 'FLOODED' ? '🌊' : '💧'}
-              </b>
+              <Link
+                to={`/explainable-ai?street=${encodeURIComponent(segment.id || '')}&horizon=${encodeURIComponent(timeLabel)}`}
+                className="jd-route-risk-link"
+                title="View Flood Risk Analysis for this location"
+              >
+                VIEW FLOOD RISK →
+              </Link>
+              <span className={`jd-seg-status-pill ${segment.status.toLowerCase()}`}>
+                {segment.status}
+              </span>
             </div>
           ))}
         </div>
