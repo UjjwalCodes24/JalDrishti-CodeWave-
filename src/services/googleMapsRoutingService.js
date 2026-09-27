@@ -34,13 +34,36 @@ export function getGoogleMapsApiKey() {
 
 export function buildGoogleMapsDirectionsUrl(origin, destination, travelMode = 'Emergency Vehicle', regionId = DEFAULT_REGION_ID) {
   const suffix = getRoutingGeocodeSuffix(regionId)
-  const originStr = typeof origin === 'string' ? origin : origin ? `${origin.latitude || origin.lat},${origin.longitude || origin.lng}` : suffix
-  const destStr = typeof destination === 'string' ? destination : destination ? `${destination.latitude || destination.lat},${destination.longitude || destination.lng}` : suffix
-  const navMode = googleNavModeMap[travelMode] || 'driving'
-  const cityToken = suffix.split(',')[0]
 
-  const originQuery = originStr.includes(cityToken) ? originStr : `${originStr}, ${suffix}`
-  const destQuery = destStr.includes(cityToken) ? destStr : `${destStr}, ${suffix}`
+  const formatEndpoint = (ep) => {
+    if (!ep) return suffix
+    if (typeof ep === 'object') {
+      const lat = ep.lat ?? ep.latitude
+      const lng = ep.lng ?? ep.longitude
+      if (lat != null && lng != null) {
+        const parsedLat = typeof lat === 'number' ? lat : parseFloat(lat)
+        const parsedLng = typeof lng === 'number' ? lng : parseFloat(lng)
+        return `${parsedLat},${parsedLng}`
+      }
+      return ep.name || ep.label || suffix
+    }
+    const str = String(ep).trim()
+    // Parse coordinates from string if present (e.g. "Current Location (28.7057° N, 77.1043° E)" or "28.7057, 77.1043")
+    const coordMatch = str.match(/(-?\d+(?:\.\d+)?)[°\s,NS]*[,\s]+(-?\d+(?:\.\d+)?)/i)
+    if (coordMatch && !isNaN(parseFloat(coordMatch[1])) && !isNaN(parseFloat(coordMatch[2]))) {
+      return `${parseFloat(coordMatch[1])},${parseFloat(coordMatch[2])}`
+    }
+    return str || suffix
+  }
+
+  const originStr = formatEndpoint(origin)
+  const destStr = formatEndpoint(destination)
+  const navMode = googleNavModeMap[travelMode] || 'driving'
+  const cityToken = suffix.split(',')[0].trim().toLowerCase()
+
+  const isCoord = (str) => /^-?\d+(?:\.\d+)?[,\s]+-?\d+(?:\.\d+)?$/.test(str.trim())
+  const originQuery = isCoord(originStr) ? originStr.replace(/\s+/g, '') : (originStr.toLowerCase().includes(cityToken) ? originStr : `${originStr}, ${suffix}`)
+  const destQuery = isCoord(destStr) ? destStr.replace(/\s+/g, '') : (destStr.toLowerCase().includes(cityToken) ? destStr : `${destStr}, ${suffix}`)
 
   const params = new URLSearchParams({
     api: '1',
@@ -49,7 +72,8 @@ export function buildGoogleMapsDirectionsUrl(origin, destination, travelMode = '
     travelmode: navMode,
   })
 
-  return `https://www.google.com/maps/dir/?${params.toString()}`
+  // Ensure origin and destination coordinates maintain literal commas in URL for Google Maps
+  return `https://www.google.com/maps/dir/?${params.toString().replace(/%2C/g, ',')}`
 }
 
 export function loadGoogleMapsApi() {
@@ -107,6 +131,25 @@ export function loadGoogleMapsApi() {
   }
 
   return googleMapsPromise
+}
+
+export async function reverseGeocodeCoordinates(lat, lng) {
+  try {
+    const maps = await loadGoogleMapsApi()
+    if (!maps?.Geocoder) return null
+    const geocoder = new maps.Geocoder()
+    return new Promise((resolve) => {
+      geocoder.geocode({ location: { lat: Number(lat), lng: Number(lng) } }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          resolve(results[0].formatted_address)
+        } else {
+          resolve(null)
+        }
+      })
+    })
+  } catch {
+    return null
+  }
 }
 
 export function evaluatePolylineAgainstFloodData(polyline, prediction, regionId = DEFAULT_REGION_ID) {
@@ -313,14 +356,34 @@ export async function getGoogleRoutes(origin, destination, travelMode = 'Emergen
   const directionsService = new maps.DirectionsService()
   const modeKey = travelModeMap[travelMode] || 'DRIVING'
   const suffix = getRoutingGeocodeSuffix(regionId)
-  const cityToken = suffix.split(',')[0]
+  const cityToken = suffix.split(',')[0].trim().toLowerCase()
 
   const locations = getRoadLocations(regionId)
-  const originNode = locations.find((l) => l.name.toLowerCase() === (origin || '').trim().toLowerCase() || l.id.toLowerCase() === (origin || '').trim().toLowerCase())
-  const destNode = locations.find((l) => l.name.toLowerCase() === (destination || '').trim().toLowerCase() || l.id.toLowerCase() === (destination || '').trim().toLowerCase())
 
-  const originParam = originNode ? { lat: originNode.latitude, lng: originNode.longitude } : ((origin || '').includes(cityToken) ? origin : `${origin}, ${suffix}`)
-  const destParam = destNode ? { lat: destNode.latitude, lng: destNode.longitude } : ((destination || '').includes(cityToken) ? destination : `${destination}, ${suffix}`)
+  const parseEndpoint = (endpoint) => {
+    if (!endpoint) return suffix
+    if (typeof endpoint === 'object') {
+      const lat = endpoint.lat ?? endpoint.latitude
+      const lng = endpoint.lng ?? endpoint.longitude
+      if (lat != null && lng != null) {
+        return { lat: Number(lat), lng: Number(lng) }
+      }
+      return endpoint.name || endpoint.label || suffix
+    }
+    const str = String(endpoint).trim()
+    const coordMatch = str.match(/(-?\d+(?:\.\d+)?)[°\s,NS]*[,\s]+(-?\d+(?:\.\d+)?)/i)
+    if (coordMatch && !isNaN(parseFloat(coordMatch[1])) && !isNaN(parseFloat(coordMatch[2]))) {
+      return { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) }
+    }
+    const node = locations.find((l) => l.name.toLowerCase() === str.toLowerCase() || l.id.toLowerCase() === str.toLowerCase())
+    if (node) {
+      return { lat: node.latitude, lng: node.longitude }
+    }
+    return str.toLowerCase().includes(cityToken) ? str : `${str}, ${suffix}`
+  }
+
+  const originParam = parseEndpoint(origin)
+  const destParam = parseEndpoint(destination)
 
   return new Promise((resolve, reject) => {
     directionsService.route(
@@ -373,64 +436,189 @@ export async function calculateGoogleAwareSafeRoute({
 }) {
   const activeRegionId = resolveRegionId(regionId)
   const regionConfig = getRegionConfig(activeRegionId)
-  const resolvedOrigin = origin || regionConfig.defaultOrigin
-  const resolvedDestination = destination || regionConfig.defaultDestination
-  const { startId, destinationId } = resolveRoadLocationIds(resolvedOrigin, resolvedDestination, activeRegionId)
+  const [centerLat, centerLng] = regionConfig.center || [20.5937, 78.9629]
+  const locations = getRoadLocations(activeRegionId)
+
+  // Extract explicit GPS coordinates if passed as object or coordinate string
+  const extractCoords = (ep) => {
+    if (!ep) return null
+    if (typeof ep === 'object' && (ep.lat != null || ep.latitude != null)) {
+      return { lat: Number(ep.lat ?? ep.latitude), lng: Number(ep.lng ?? ep.longitude) }
+    }
+    if (typeof ep === 'string') {
+      const match = ep.match(/(-?\d+(?:\.\d+)?)[°\s,NS]*[,\s]+(-?\d+(?:\.\d+)?)/i)
+      if (match && !isNaN(parseFloat(match[1])) && !isNaN(parseFloat(match[2]))) {
+        return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) }
+      }
+    }
+    return null
+  }
+
+  const originCoords = extractCoords(origin)
+  const destCoords = extractCoords(destination)
+
+  const resolvedOrigin = originCoords || origin || regionConfig.defaultOrigin
+  const resolvedDestination = destCoords || destination || regionConfig.defaultDestination
+
+  const originLabel = originCoords
+    ? 'CURRENT LOCATION'
+    : (typeof resolvedOrigin === 'string' ? resolvedOrigin : regionConfig.defaultOrigin)
+
+  const destLabel = destCoords
+    ? 'DESTINATION'
+    : (typeof resolvedDestination === 'string' ? resolvedDestination : regionConfig.defaultDestination)
+
+  const { startId, destinationId } = resolveRoadLocationIds(originLabel, destLabel, activeRegionId)
   const resolvedStartId = fallbackStartId || startId
   const resolvedDestId = fallbackDestinationId || destinationId
 
   const fallbackResult = calculateSafeRoute(resolvedStartId, resolvedDestId, time, mode, activeRegionId)
   const demonstrationNotice = `JalDrishti demonstration route for ${regionConfig.shortName || regionConfig.name}. Simulated flood-aware corridors — not live Google routing.`
 
-  const apiKey = getGoogleMapsApiKey()
-  if (!apiKey || apiKey.trim() === '' || apiKey.includes('YOUR_GOOGLE_MAPS_API_KEY')) {
+  // Always compute the explicit external navigation URL using actual origin (coords or name) and destination
+  const explicitGoogleMapsUrl = buildGoogleMapsDirectionsUrl(
+    originCoords || resolvedOrigin,
+    destCoords || resolvedDestination,
+    mode,
+    activeRegionId
+  )
+
+  const startNode = originCoords
+    ? {
+        id: 'user-current-location',
+        name: 'CURRENT LOCATION',
+        latitude: originCoords.lat,
+        longitude: originCoords.lng,
+      }
+    : (locations.find((l) => l.name.toLowerCase() === originLabel.toLowerCase() || l.id.toLowerCase() === originLabel.toLowerCase()) || {
+        id: resolvedStartId || 'custom-origin',
+        name: originLabel,
+        latitude: centerLat,
+        longitude: centerLng,
+      })
+
+  const destNode = destCoords
+    ? {
+        id: 'user-custom-destination',
+        name: typeof destination === 'string' ? destination : 'DESTINATION',
+        latitude: destCoords.lat,
+        longitude: destCoords.lng,
+      }
+    : (locations.find((l) => l.name.toLowerCase() === destLabel.toLowerCase() || l.id.toLowerCase() === destLabel.toLowerCase()) || {
+        id: resolvedDestId || 'custom-destination',
+        name: destLabel,
+        latitude: centerLat,
+        longitude: centerLng,
+      })
+
+  const sanitizeFallbackResult = (result, extraNotice = null, errorMsg = null) => {
+    const updatedRoutes = (result.routes || []).map((r) => {
+      let coords = r.coordinates || r.polyline || []
+      if (originCoords && coords.length > 0) {
+        coords = [{ lat: originCoords.lat, lng: originCoords.lng }, ...coords]
+      }
+      return {
+        ...r,
+        source: originCoords ? 'CURRENT LOCATION' : r.source,
+        googleMapsUrl: explicitGoogleMapsUrl,
+        coordinates: coords,
+        polyline: coords,
+        routePolyline: coords,
+      }
+    })
+
+    const updatedRecommended = result.recommended
+      ? {
+          ...result.recommended,
+          source: originCoords ? 'CURRENT LOCATION' : result.recommended.source,
+          googleMapsUrl: explicitGoogleMapsUrl,
+          coordinates: originCoords && (result.recommended.coordinates?.length || 0) > 0
+            ? [{ lat: originCoords.lat, lng: originCoords.lng }, ...result.recommended.coordinates]
+            : result.recommended.coordinates,
+          polyline: originCoords && (result.recommended.polyline?.length || 0) > 0
+            ? [{ lat: originCoords.lat, lng: originCoords.lng }, ...result.recommended.polyline]
+            : result.recommended.polyline,
+          routePolyline: originCoords && (result.recommended.routePolyline?.length || 0) > 0
+            ? [{ lat: originCoords.lat, lng: originCoords.lng }, ...result.recommended.routePolyline]
+            : result.recommended.routePolyline,
+        }
+      : null
+
+    const updatedAlternative = result.alternative
+      ? {
+          ...result.alternative,
+          source: originCoords ? 'CURRENT LOCATION' : result.alternative.source,
+          googleMapsUrl: explicitGoogleMapsUrl,
+        }
+      : null
+
+    const updatedShortest = result.shortestNormal
+      ? {
+          ...result.shortestNormal,
+          source: originCoords ? 'CURRENT LOCATION' : result.shortestNormal.source,
+          googleMapsUrl: explicitGoogleMapsUrl,
+        }
+      : null
+
     return {
-      ...fallbackResult,
+      ...result,
+      start: startNode,
+      destination: destNode,
+      routes: updatedRoutes,
+      recommended: updatedRecommended,
+      alternative: updatedAlternative,
+      shortestNormal: updatedShortest,
       googleMapsAvailable: false,
       sourceType: 'simulation',
-      notice: demonstrationNotice,
+      notice: extraNotice || demonstrationNotice,
+      googleError: errorMsg,
     }
+  }
+
+  const apiKey = getGoogleMapsApiKey()
+  if (!apiKey || apiKey.trim() === '' || apiKey.includes('YOUR_GOOGLE_MAPS_API_KEY')) {
+    return sanitizeFallbackResult(fallbackResult)
   }
 
   try {
     const rawRoutes = await getGoogleRoutes(resolvedOrigin, resolvedDestination, mode, activeRegionId)
     if (!rawRoutes || rawRoutes.length === 0) {
-      return {
-        ...fallbackResult,
-        googleMapsAvailable: false,
-        sourceType: 'simulation',
-        notice: demonstrationNotice,
-      }
+      return sanitizeFallbackResult(fallbackResult)
     }
 
     // Normalize and evaluate each Google route against JalDrishti flood prediction
     const evaluatedRoutes = rawRoutes
       .slice(0, 3)
-      .map((route, index) => normalizeGoogleRoute(route, index, resolvedOrigin, resolvedDestination, time, mode, activeRegionId))
+      .map((route, index) => {
+        const normalized = normalizeGoogleRoute(route, index, resolvedOrigin, resolvedDestination, time, mode, activeRegionId)
+        return {
+          ...normalized,
+          source: originCoords ? 'CURRENT LOCATION' : normalized.source,
+          googleMapsUrl: explicitGoogleMapsUrl,
+        }
+      })
 
     // 1. Identify shortest route (by distance)
     const sortedByDistance = [...evaluatedRoutes].sort((a, b) => a.distance - b.distance)
     const shortestCandidate = sortedByDistance[0]
 
     // 2. Rank all routes by SAFETY SCORE (highest safety score first)
-    // Core Differentiator: Safety must have higher priority than shortest distance!
     evaluatedRoutes.sort((a, b) => b.safetyScore - a.safetyScore)
 
     const viableRoutes = evaluatedRoutes.filter((r) => r.viable)
     const recommended = viableRoutes[0] || evaluatedRoutes[0] || null
     const alternative = viableRoutes.length > 1 ? viableRoutes[1] : evaluatedRoutes.find((r) => r !== recommended) || null
 
-    // Shortest normal route is kept separately for comparison
     let shortestNormal = shortestCandidate
     if (shortestNormal && shortestNormal.id === recommended?.id) {
-      // If shortest is also the recommended safe route, find an alternative or keep it
       shortestNormal = evaluatedRoutes.find((r) => r.id !== recommended?.id) || shortestCandidate
     }
 
-    // Update names & status descriptions
     if (recommended) {
       recommended.name = 'RECOMMENDED SAFE ROUTE'
       recommended.status = 'RECOMMENDED'
+      recommended.googleMapsUrl = explicitGoogleMapsUrl
+      recommended.source = originCoords ? 'CURRENT LOCATION' : recommended.source
       recommended.reason = recommended.maximumWaterDepth < (shortestNormal?.maximumWaterDepth || 30)
         ? `Recommended because it maintains a safe maximum water depth of ${recommended.maximumWaterDepth} cm and avoids ${recommended.roadsAvoided} critical flood zones, outperforming shorter but flooded alternatives.`
         : `Recommended corridor with lowest surface runoff risk and clear drainage nodes.`
@@ -438,21 +626,20 @@ export async function calculateGoogleAwareSafeRoute({
     if (alternative && alternative.id !== recommended?.id) {
       alternative.name = 'ALTERNATIVE ROUTE'
       alternative.status = 'ALTERNATIVE'
+      alternative.googleMapsUrl = explicitGoogleMapsUrl
+      alternative.source = originCoords ? 'CURRENT LOCATION' : alternative.source
       alternative.reason = `Alternative viable option with ${alternative.maximumWaterDepth} cm predicted water accumulation.`
     }
     if (shortestNormal && shortestNormal.id !== recommended?.id) {
       const isUnsafe = shortestNormal.safetyScore < 60 || !shortestNormal.viable || shortestNormal.maximumWaterDepth >= 25
       shortestNormal.name = isUnsafe ? 'SHORTEST BUT UNSAFE' : 'SHORTEST NORMAL ROUTE'
       shortestNormal.status = isUnsafe ? 'UNSAFE' : 'PASSABLE'
+      shortestNormal.googleMapsUrl = explicitGoogleMapsUrl
+      shortestNormal.source = originCoords ? 'CURRENT LOCATION' : shortestNormal.source
       shortestNormal.reason = isUnsafe
         ? `Shortest direct route reaches ${shortestNormal.maximumWaterDepth} cm predicted flood depth with ${shortestNormal.blockedSegments} blocked road segment(s).`
         : `Direct shortest corridor with ${shortestNormal.travelTime} min ETA.`
     }
-
-    const locations = getRoadLocations(activeRegionId)
-    const [centerLat, centerLng] = regionConfig.center || [20.5937, 78.9629]
-    const startNode = locations.find((l) => l.id === resolvedStartId) || { id: resolvedStartId, name: resolvedOrigin, latitude: centerLat, longitude: centerLng }
-    const destNode = locations.find((l) => l.id === resolvedDestId) || { id: resolvedDestId, name: resolvedDestination, latitude: centerLat, longitude: centerLng }
 
     return {
       regionId: activeRegionId,
@@ -473,12 +660,7 @@ export async function calculateGoogleAwareSafeRoute({
       floodHotspots: (getFloodPrediction(time, activeRegionId).streets || []).filter((street) => street.waterDepth > 0),
     }
   } catch (error) {
-    return {
-      ...fallbackResult,
-      googleMapsAvailable: false,
-      sourceType: 'simulation',
-      notice: demonstrationNotice,
-      googleError: error?.message || 'Google Maps API error',
-    }
+    return sanitizeFallbackResult(fallbackResult, null, error?.message || 'Google Maps API error')
   }
 }
+

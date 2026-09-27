@@ -189,10 +189,11 @@ function RouteMap({ routingResult, regionCenter, mapKey, selectedRouteId, onSele
           const startPos = toLatLng(routingResult.start) || { lat: centerLat, lng: centerLng }
           const destPos = toLatLng(routingResult.destination) || { lat: centerLat, lng: centerLng }
 
+          const isCurrentOrigin = routingResult.start?.name === 'CURRENT LOCATION' || routingResult.start?.id === 'user-current-location'
           const startMarker = new maps.Marker({
             position: startPos,
             map,
-            title: `Origin: ${routingResult.start.name || 'Start'}`,
+            title: isCurrentOrigin ? 'CURRENT LOCATION' : `Origin: ${routingResult.start?.name || 'Start'}`,
             icon: {
               path: maps.SymbolPath.CIRCLE,
               scale: 8,
@@ -397,6 +398,11 @@ function FallbackRouteMap({ routingResult, regionCenter, mapKey, selectedRouteId
           >
             <Popup>
               <strong>{routingResult.start?.name || 'Origin'}</strong>
+              {startPos && typeof startPos.lat === 'number' && typeof startPos.lng === 'number' && (routingResult?.start?.name === 'CURRENT LOCATION' || routingResult?.start?.id === 'user-current-location') && (
+                <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }}>
+                  {startPos.lat.toFixed(4)}° N, {startPos.lng.toFixed(4)}° E
+                </div>
+              )}
             </Popup>
           </CircleMarker>
         )}

@@ -34,8 +34,8 @@ export function getRoutingGeocodeSuffix(regionId = DEFAULT_REGION_ID) {
 export function resolveRoadLocationIds(origin, destination, regionId = DEFAULT_REGION_ID) {
   const network = getRoadNetwork(regionId)
   const nodes = network.nodes || []
-  const normalizedOrigin = (origin || '').trim().toLowerCase()
-  const normalizedDestination = (destination || '').trim().toLowerCase()
+  const normalizedOrigin = typeof origin === 'string' ? origin.trim().toLowerCase() : ''
+  const normalizedDestination = typeof destination === 'string' ? destination.trim().toLowerCase() : ''
 
   const defaultStart = nodes[0]?.id || 'START'
   const defaultDest = nodes[1]?.id || nodes[0]?.id || 'DEST'

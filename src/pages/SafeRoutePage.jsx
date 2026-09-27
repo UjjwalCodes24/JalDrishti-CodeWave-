@@ -49,6 +49,10 @@ function SafeRoutePage() {
 
   const [customOrigin, setCustomOrigin] = useState('')
   const [customDestination, setCustomDestination] = useState('')
+  const [originCoords, setOriginCoords] = useState(null)
+  const [destCoords, setDestCoords] = useState(null)
+  const [isCurrentLocationActive, setIsCurrentLocationActive] = useState(false)
+  const [routingError, setRoutingError] = useState(null)
   const [selectedTime, setSelectedTime] = useState(paramHorizon)
   const [routeType, setRouteType] = useState('Emergency Vehicle')
   const [loading, setLoading] = useState(false)
@@ -63,22 +67,79 @@ function SafeRoutePage() {
     }
   }, [searchParams, setSelectedHorizon])
 
+  // Reset custom coordinates if region changes
+  useEffect(() => {
+    setCustomOrigin('')
+    setCustomDestination('')
+    setOriginCoords(null)
+    setDestCoords(null)
+    setIsCurrentLocationActive(false)
+    setRoutingError(null)
+  }, [regionId])
+
+  const defaultOriginName = routeDataset?.defaultOrigin || locations?.[0]?.name || 'Origin'
+  const defaultDestName = routeDataset?.defaultDestination || locations?.[1]?.name || 'Destination'
+
+  const originCoordsText = originCoords && typeof originCoords.lat === 'number' && typeof originCoords.lng === 'number'
+    ? `Current Location (${originCoords.lat.toFixed(4)}° N, ${originCoords.lng.toFixed(4)}° E)`
+    : null
+
+  const origin = isCurrentLocationActive && originCoordsText
+    ? originCoordsText
+    : (customOrigin || defaultOriginName)
+
+  const destination = customDestination || defaultDestName
+
+  const effectiveOrigin = isCurrentLocationActive && originCoords
+    ? originCoords
+    : origin
+
+  const effectiveDestination = destCoords || destination
+
+  const originDisplayName = isCurrentLocationActive && originCoordsText
+    ? originCoordsText
+    : origin
+
+  const destinationDisplayName = typeof effectiveDestination === 'object'
+    ? (effectiveDestination.name || effectiveDestination.label || destination)
+    : destination
+
   const [routingResult, setRoutingResult] = useState(() => {
-    const { startId, destinationId } = resolveRoadLocationIds(
-      routeDataset.defaultOrigin,
-      routeDataset.defaultDestination,
-      regionId
-    )
-    return calculateSafeRoute(startId, destinationId, 'NOW', 'Emergency Vehicle', regionId)
+    try {
+      const { startId, destinationId } = resolveRoadLocationIds(
+        routeDataset?.defaultOrigin || 'START',
+        routeDataset?.defaultDestination || 'DEST',
+        regionId
+      )
+      return calculateSafeRoute(startId, destinationId, 'NOW', 'Emergency Vehicle', regionId)
+    } catch {
+      return {
+        routes: [],
+        recommended: null,
+        alternative: null,
+        shortestNormal: null,
+        googleMapsAvailable: false,
+      }
+    }
   })
 
-  const regionLocationNames = new Set(locations.map((location) => location.name))
-  const origin = regionLocationNames.has(customOrigin)
-    ? customOrigin
-    : routeDataset.defaultOrigin || locations[0]?.name || 'Origin'
-  const destination = regionLocationNames.has(customDestination)
-    ? customDestination
-    : routeDataset.defaultDestination || locations[1]?.name || 'Destination'
+  const handleOriginChange = (val, coords = null) => {
+    setRoutingError(null)
+    setCustomOrigin(val)
+    if (coords && coords.lat != null && coords.lng != null) {
+      setOriginCoords(coords)
+      setIsCurrentLocationActive(true)
+    } else {
+      setOriginCoords(null)
+      setIsCurrentLocationActive(false)
+    }
+  }
+
+  const handleDestinationChange = (val, coords = null) => {
+    setRoutingError(null)
+    setCustomDestination(val)
+    setDestCoords(coords)
+  }
 
   const loadingIntervalRef = useRef(null)
   const forecast = useMemo(() => getFloodForecast(regionId), [regionId])
@@ -92,12 +153,40 @@ function SafeRoutePage() {
   }, [forecast])
 
   const handleCalculate = async (
-    targetOrigin = origin,
-    targetDestination = destination,
+    targetOrigin = effectiveOrigin,
+    targetDestination = effectiveDestination,
     nextTime = selectedTime,
     nextMode = routeType
   ) => {
-    const { startId, destinationId } = resolveRoadLocationIds(targetOrigin, targetDestination, regionId)
+    setRoutingError(null)
+
+    // Requirement 5: If current location was selected, use actual coordinates.
+    // If coordinate is unavailable, do NOT silently fall back to Shivaji Railway Bridge or demo corridors.
+    if (isCurrentLocationActive && (!originCoords || originCoords.lat == null || originCoords.lng == null)) {
+      setRoutingError('Current location is unavailable. Please select your starting point again.')
+      return
+    }
+
+    if (
+      typeof targetOrigin === 'string' &&
+      targetOrigin.toLowerCase().startsWith('current location') &&
+      !originCoords
+    ) {
+      setRoutingError('Current location is unavailable. Please select your starting point again.')
+      return
+    }
+
+    const actualOrigin = (isCurrentLocationActive && originCoords) ? originCoords : targetOrigin
+    const actualDestination = targetDestination
+
+    const originLabel = typeof actualOrigin === 'object'
+      ? (actualOrigin.name || actualOrigin.label || 'Current Location')
+      : actualOrigin
+    const destLabel = typeof actualDestination === 'object'
+      ? (actualDestination.name || actualDestination.label || 'Destination')
+      : actualDestination
+
+    const { startId, destinationId } = resolveRoadLocationIds(originLabel, destLabel, regionId)
     setLoading(true)
     setLoadingStepIdx(0)
 
@@ -107,8 +196,8 @@ function SafeRoutePage() {
 
     try {
       const result = await calculateGoogleAwareSafeRoute({
-        origin: targetOrigin,
-        destination: targetDestination,
+        origin: actualOrigin,
+        destination: actualDestination,
         time: nextTime,
         mode: nextMode,
         fallbackStartId: startId,
@@ -140,11 +229,19 @@ function SafeRoutePage() {
 
   useEffect(() => {
     let active = true
-    const { startId, destinationId } = resolveRoadLocationIds(origin, destination, regionId)
+    const currentOrigin = (isCurrentLocationActive && originCoords) ? originCoords : effectiveOrigin
+    const currentDest = effectiveDestination
+    const originLabel = typeof currentOrigin === 'object'
+      ? (currentOrigin.name || currentOrigin.label || 'Current Location')
+      : currentOrigin
+    const destLabel = typeof currentDest === 'object'
+      ? (currentDest.name || currentDest.label || 'Destination')
+      : currentDest
+    const { startId, destinationId } = resolveRoadLocationIds(originLabel, destLabel, regionId)
 
     calculateGoogleAwareSafeRoute({
-      origin,
-      destination,
+      origin: currentOrigin,
+      destination: currentDest,
       time: selectedTime,
       mode: routeType,
       fallbackStartId: startId,
@@ -170,16 +267,16 @@ function SafeRoutePage() {
     return () => {
       active = false
     }
-  }, [origin, destination, selectedTime, routeType, regionId])
+  }, [effectiveOrigin, effectiveDestination, selectedTime, routeType, regionId, isCurrentLocationActive, originCoords])
 
   const updateRouteTime = async (time) => {
     setSelectedTime(time)
-    await handleCalculate(origin, destination, time, routeType)
+    await handleCalculate(effectiveOrigin, effectiveDestination, time, routeType)
   }
 
   const updateRouteType = async (mode) => {
     setRouteType(mode)
-    await handleCalculate(origin, destination, selectedTime, mode)
+    await handleCalculate(effectiveOrigin, effectiveDestination, selectedTime, mode)
   }
 
   // Extract all evaluated routes
@@ -277,16 +374,53 @@ function SafeRoutePage() {
         locations={locations}
         origin={origin}
         destination={destination}
-        onOriginChange={setCustomOrigin}
-        onDestinationChange={setCustomDestination}
-        onCalculate={(o, d) => handleCalculate(o || origin, d || destination)}
+        originCoords={originCoords}
+        isCurrentLocationActive={isCurrentLocationActive}
+        onOriginChange={handleOriginChange}
+        onDestinationChange={handleDestinationChange}
+        onPresetSelect={(preset) => {
+          setIsCurrentLocationActive(false)
+          setOriginCoords(null)
+          setRoutingError(null)
+          setCustomOrigin(preset.origin)
+          setCustomDestination(preset.destination)
+          handleCalculate(preset.origin, preset.destination, selectedTime, routeType)
+        }}
+        onCalculate={(o, d) => {
+          const targetO = isCurrentLocationActive && originCoords ? originCoords : (o || effectiveOrigin)
+          const targetD = d || destCoords || customDestination || effectiveDestination
+          handleCalculate(targetO, targetD)
+        }}
         loading={loading}
-        googleMapsAvailable={routingResult.googleMapsAvailable}
+        googleMapsAvailable={routingResult?.googleMapsAvailable}
         corridors={corridors}
-        originPlaceholder={routeDataset.defaultOrigin || 'Start location'}
-        destinationPlaceholder={routeDataset.defaultDestination || 'Destination'}
+        originPlaceholder="Enter starting location or use GPS"
+        destinationPlaceholder="Enter destination (e.g. Connaught Place, Mumbai Airport)"
         regionName={routeDataset.regionName || 'the selected region'}
+        regionId={regionId}
       />
+
+      {/* Current Location Error Advisory Banner */}
+      {routingError && (
+        <div
+          role="alert"
+          style={{
+            margin: '10px 0',
+            padding: '10px 14px',
+            background: '#FEF2F2',
+            border: '1px solid #FCA5A5',
+            borderRadius: '4px',
+            fontSize: '12px',
+            color: '#991B1B',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <strong style={{ fontWeight: 700 }}>LOCATION ADVISORY:</strong>
+          <span>{routingError}</span>
+        </div>
+      )}
 
       {/* ── Forecast Horizon Timeline & Vehicle Mode ── */}
       <Panel className="route-controls-panel">
@@ -311,6 +445,13 @@ function SafeRoutePage() {
             <strong>Evaluating Route Safety…</strong>
             <span>{LOADING_STEPS[loadingStepIdx]}</span>
           </div>
+        </div>
+      )}
+
+      {/* Notice if Google Maps has an issue or simulation fallback */}
+      {routingResult.googleError && (
+        <div style={{ margin: '10px 0', padding: '10px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '4px', fontSize: '12px', color: '#92400E' }}>
+          <strong>Routing Advisory:</strong> Google Maps routing is currently operating in fallback mode for this corridor. JalDrishti regional hydrological simulation remains active.
         </div>
       )}
 
@@ -392,11 +533,11 @@ function SafeRoutePage() {
               <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #D9DEE5', color: '#475569' }}>
                 <th style={{ padding: '8px 12px', fontWeight: 600 }}>ROUTE</th>
                 <th style={{ padding: '8px 12px', fontWeight: 600 }}>DISTANCE</th>
-                <th style={{ padding: '8px 12px', fontWeight: 600 }}>TIME</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>ESTIMATED TIME</th>
                 <th style={{ padding: '8px 12px', fontWeight: 600 }}>MAX PREDICTED DEPTH</th>
-                <th style={{ padding: '8px 12px', fontWeight: 600 }}>FLOOD EXPOSURE</th>
                 <th style={{ padding: '8px 12px', fontWeight: 600 }}>AFFECTED SEGMENTS</th>
-                <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>INSPECT</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>FLOOD EXPOSURE</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -418,17 +559,19 @@ function SafeRoutePage() {
                     onClick={() => setSelectedRouteId(route.id)}
                   >
                     <td style={{ padding: '8px 12px', fontWeight: 600 }}>
-                      {route.name || `Route Alternative ${idx + 1}`}
-                      {isLow && (
-                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#059669', background: '#DCFCE7', padding: '1px 5px', borderRadius: '3px' }}>
-                          LOWER PREDICTED FLOOD EXPOSURE
-                        </span>
-                      )}
-                      {isShort && (
-                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#0284C7', background: '#E0F2FE', padding: '1px 5px', borderRadius: '3px' }}>
-                          SHORTEST ROUTE
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <span>{route.name || `Route Alternative ${idx + 1}`}</span>
+                        {isLow && (
+                          <span style={{ fontSize: '10px', color: '#059669', background: '#DCFCE7', padding: '1px 6px', borderRadius: '3px', fontWeight: 700 }}>
+                            LOWER PREDICTED FLOOD EXPOSURE
+                          </span>
+                        )}
+                        {isShort && (
+                          <span style={{ fontSize: '10px', color: '#0284C7', background: '#E0F2FE', padding: '1px 6px', borderRadius: '3px', fontWeight: 700 }}>
+                            SHORTEST DIRECT ROUTE
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td style={{ padding: '8px 12px' }}>{route.distance} km</td>
                     <td style={{ padding: '8px 12px' }}>{route.travelTime} min</td>
@@ -436,39 +579,91 @@ function SafeRoutePage() {
                       {typeof maxD === 'number' ? maxD.toFixed(1) : maxD} cm
                     </td>
                     <td style={{ padding: '8px 12px' }}>
+                      {flooded} flooded ({blocked} critical)
+                    </td>
+                    <td style={{ padding: '8px 12px' }}>
                       <span className={`route-status-pill status-${route.floodExposure === 'CRITICAL' ? 'danger' : route.floodExposure === 'HIGH' ? 'danger' : route.floodExposure === 'MODERATE' ? 'warning' : 'safe'}`}>
                         {route.floodExposure || 'LOW'}
                       </span>
                     </td>
-                    <td style={{ padding: '8px 12px' }}>
-                      {flooded} flooded ({blocked} critical)
-                    </td>
                     <td style={{ padding: '8px 12px', textAlign: 'right' }}>
-                      <button
-                        type="button"
-                        style={{
-                          padding: '3px 8px',
-                          fontSize: '11px',
-                          fontWeight: 500,
-                          borderRadius: '4px',
-                          border: '1px solid #CBD5E1',
-                          background: isSelected ? '#0F233A' : '#FFFFFF',
-                          color: isSelected ? '#FFFFFF' : '#334155',
-                          cursor: 'pointer',
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedRouteId(route.id)
-                        }}
-                      >
-                        {isSelected ? 'Selected' : 'Inspect'}
-                      </button>
+                      <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                        <button
+                          type="button"
+                          style={{
+                            padding: '3px 8px',
+                            fontSize: '11px',
+                            fontWeight: 500,
+                            borderRadius: '4px',
+                            border: '1px solid #CBD5E1',
+                            background: isSelected ? '#0F233A' : '#FFFFFF',
+                            color: isSelected ? '#FFFFFF' : '#334155',
+                            cursor: 'pointer',
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedRouteId(route.id)
+                          }}
+                        >
+                          {isSelected ? 'Selected' : 'Inspect'}
+                        </button>
+                        {route.googleMapsUrl && (
+                          <a
+                            href={route.googleMapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              padding: '3px 8px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              borderRadius: '4px',
+                              background: '#F1F5F9',
+                              border: '1px solid #CBD5E1',
+                              color: '#0F233A',
+                              textDecoration: 'none',
+                              whiteSpace: 'nowrap',
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            title="Open this route in Google Maps navigation"
+                          >
+                            Open in Google Maps →
+                          </a>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* Required Operational Disclaimer Banner */}
+        <div style={{ marginTop: '12px', padding: '10px 14px', background: '#F8FAFC', border: '1px solid #D9DEE5', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <span style={{ fontSize: '12px', color: '#475569' }}>
+            <strong>OPERATIONAL ADVISORY:</strong> Route assessment is based on current JalDrishti flood predictions and does not guarantee road safety.
+          </span>
+          {activeRoute?.googleMapsUrl && (
+            <a
+              href={activeRoute.googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#0F233A',
+                color: '#FFFFFF',
+                padding: '6px 12px',
+                fontSize: '11px',
+                fontWeight: 600,
+                borderRadius: '4px',
+                textDecoration: 'none',
+              }}
+            >
+              <span>OPEN ROUTE IN GOOGLE MAPS →</span>
+            </a>
+          )}
         </div>
       </Panel>
 
@@ -480,7 +675,7 @@ function SafeRoutePage() {
             <div>
               <span className="eyebrow">ROAD NETWORK & FLOOD EXPOSURE</span>
               <h2>
-                {origin} → {destination}
+                {originDisplayName} → {destinationDisplayName}
               </h2>
             </div>
             <span className="route-map-status">
