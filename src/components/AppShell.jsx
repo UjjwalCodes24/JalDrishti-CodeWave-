@@ -16,13 +16,15 @@ const navGroups = [
   {
     label: 'ANALYSIS',
     items: [
-      { to: '/explainable-ai', label: 'Flood Risk Analysis', icon: 'why' },
+      { to: '/explainable-ai', label: 'Flood Risk Analysis', end: true, icon: 'why' },
+      { to: '/explainable-ai?tab=scenarios#scenarios', label: 'Scenario Analysis', icon: 'scenario' },
     ]
   },
   {
     label: 'SYSTEM',
     items: [
       { to: '/data-status', label: 'Data & Model Status', icon: 'status' },
+      { to: '#region-selector', label: 'Region', icon: 'region', isRegionAction: true },
     ]
   },
 ]
@@ -34,8 +36,10 @@ function NavIcon({ name }) {
     route: <><circle cx="7" cy="7" r="2.2" /><circle cx="17" cy="17" r="2.2" /><path d="M9 8.2c4 0 2.2 7.6 6.2 7.6" /></>,
     forecast: <><path d="M7 16.5a4 4 0 1 1 1.4-7.8A5 5 0 0 1 18.5 12a3.2 3.2 0 1 1 .2 4.5H7Z" /></>,
     why: <><path d="M8 6h8v7.2H8z" /><path d="M10 13.2V17l2-1.2 2 1.2v-3.8" /></>,
+    scenario: <><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></>,
     response: <><path d="M12 4.5 13.6 9H18l-3.6 3 1.4 4.6L12 14.2 8.2 16.6 9.6 12 6 9h4.4L12 4.5Z" /></>,
     status: <><rect x="5" y="4" width="14" height="16" rx="1.5" /><path d="M9 9h6M9 12h6M9 15h4" /></>,
+    region: <><path d="M12 21s7-6.2 7-11.2A7 7 0 0 0 5 9.8C5 14.8 12 21 12 21Z" /><circle cx="12" cy="9.8" r="2.2" /></>,
   }
   return <svg viewBox="0 0 24 24" aria-hidden="true">{icons[name]}</svg>
 }
@@ -72,18 +76,37 @@ function AppShell() {
           {navGroups.map((group) => (
             <div key={group.label} className="jd-nav-group">
               <span className="jd-nav-group-label">{group.label}</span>
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  title={item.label}
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  <span className="nav-icon"><NavIcon name={item.icon} /></span>
-                  {item.label}
-                </NavLink>
-              ))}
+              {group.items.map((item) =>
+                item.isRegionAction ? (
+                  <button
+                    type="button"
+                    key={item.label}
+                    onClick={() => {
+                      const el = document.getElementById('region-selector')
+                      if (el) {
+                        el.focus()
+                        el.click?.()
+                      }
+                    }}
+                    className="nav-link region-nav-btn"
+                    title={`Region: ${currentRegion?.name || selectedRegion}`}
+                  >
+                    <span className="nav-icon"><NavIcon name={item.icon} /></span>
+                    <span>Region: <small style={{ color: '#38bdf8', fontWeight: 600 }}>{currentRegion?.shortName || selectedRegion}</small></span>
+                  </button>
+                ) : (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.end}
+                    title={item.label}
+                    className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  >
+                    <span className="nav-icon"><NavIcon name={item.icon} /></span>
+                    {item.label}
+                  </NavLink>
+                )
+              )}
             </div>
           ))}
         </nav>

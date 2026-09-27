@@ -16,10 +16,10 @@ export const chennaiRegion = {
   defaultDestination: 'Chennai Airport',
   geocodeSuffix: 'Chennai, Tamil Nadu, India',
   crisisCorridors: [
-    { label: 'Guindy ➔ Airport', origin: 'Guindy', destination: 'Chennai Airport' },
-    { label: 'Velachery ➔ Guindy', origin: 'Velachery Junction', destination: 'Guindy' },
-    { label: 'Adyar ➔ Guindy', origin: 'Adyar', destination: 'Guindy' },
-    { label: 'Perungudi ➔ OMR', origin: 'Perungudi', destination: 'OMR' },
+    { label: 'Guindy → Airport', origin: 'Guindy', destination: 'Chennai Airport' },
+    { label: 'Velachery → Guindy', origin: 'Velachery Junction', destination: 'Guindy' },
+    { label: 'Adyar → Guindy', origin: 'Adyar', destination: 'Guindy' },
+    { label: 'Perungudi → OMR', origin: 'Perungudi', destination: 'OMR' },
   ],
   wardCoordinates: {
     'W-CHE-01': [12.9815, 80.2180],

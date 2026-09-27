@@ -534,7 +534,7 @@ function EmergencyResponsePage() {
             <div className="er-access-detail">
               <span>Primary Corridors Evaluated</span>
               <strong>
-                {currentRegion?.defaultOrigin || 'Origin'} ➔ {currentRegion?.defaultDestination || 'Destination'}
+                {currentRegion?.defaultOrigin || 'Origin'} → {currentRegion?.defaultDestination || 'Destination'}
               </strong>
             </div>
             <p className="er-access-desc">

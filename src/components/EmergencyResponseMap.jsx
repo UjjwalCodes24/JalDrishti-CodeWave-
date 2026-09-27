@@ -67,7 +67,7 @@ function EmergencyResponseMap({ streets, safeRoute, teamLocations, focusedStreet
           ) : null
         })}
         {teamLocations.map((team) => (
-          <Marker key={team.id} position={[team.latitude, team.longitude]} icon={responseIcon('👷', '#147d7e')}>
+          <Marker key={team.id} position={[team.latitude, team.longitude]} icon={responseIcon('RT', '#0f766e')}>
             <Popup>
               <div className="map-popup">
                 <strong>{team.name}</strong>
@@ -82,7 +82,7 @@ function EmergencyResponseMap({ streets, safeRoute, teamLocations, focusedStreet
         <span><i className="high-dot" />High-risk zone</span>
         <span><i className="closed-line" />Closed/restricted road</span>
         <span><i className="safe-line" />Emergency-safe route</span>
-        <span>👷 Response team</span>
+        <span><i style={{ display: 'inline-block', width: '9px', height: '9px', borderRadius: '50%', background: '#0f766e', marginRight: '6px' }} />Response team (RT)</span>
       </div>
     </div>
   )

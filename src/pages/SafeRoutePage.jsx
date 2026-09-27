@@ -265,7 +265,7 @@ function SafeRoutePage() {
                 <span className="workflow-step-num">{item.step}</span>
                 <span className="workflow-step-label">{item.label}</span>
               </div>
-              {idx < WORKFLOW_STEPS.length - 1 && <span className="workflow-step-arrow">➔</span>}
+              {idx < WORKFLOW_STEPS.length - 1 && <span className="workflow-step-arrow">→</span>}
             </div>
           ))}
         </div>
@@ -375,6 +375,103 @@ function SafeRoutePage() {
         </div>
       </Panel>
 
+      {/* ── Structured Route Comparison Table (Transport Operations System) ── */}
+      <Panel className="route-comparison-table-panel" style={{ marginBottom: '16px' }}>
+        <div className="panel-heading" style={{ marginBottom: '10px' }}>
+          <div>
+            <span className="eyebrow">OPERATIONAL ROUTE COMPARISON MATRIX</span>
+            <h3 style={{ fontSize: '15px', fontWeight: 600, margin: '2px 0 0' }}>EVALUATED CORRIDORS</h3>
+          </div>
+          <span className="route-map-status" style={{ fontSize: '11px', color: '#64748B' }}>
+            Hydrological Overlay: {selectedTime} Horizon
+          </span>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', fontSize: '12px', textAlign: 'left', borderCollapse: 'collapse', border: '1px solid #D9DEE5' }}>
+            <thead>
+              <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #D9DEE5', color: '#475569' }}>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>ROUTE</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>DISTANCE</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>TIME</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>MAX PREDICTED DEPTH</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>FLOOD EXPOSURE</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600 }}>AFFECTED SEGMENTS</th>
+                <th style={{ padding: '8px 12px', fontWeight: 600, textAlign: 'right' }}>INSPECT</th>
+              </tr>
+            </thead>
+            <tbody>
+              {evaluatedRoutes.map((route, idx) => {
+                const maxD = route.maximumWaterDepth ?? route.floodDepth ?? 0
+                const isSelected = route.id === activeRoute?.id
+                const isShort = route.distance === minDistance
+                const isLow = maxD === minDepth
+                const blocked = route.blockedSegments ?? route.blockedRoads ?? 0
+                const flooded = route.floodedSegments ?? 0
+                return (
+                  <tr
+                    key={route.id || idx}
+                    style={{
+                      background: isSelected ? '#F0F4F8' : idx % 2 === 1 ? '#FAFAFA' : '#FFFFFF',
+                      borderBottom: '1px solid #E2E8F0',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => setSelectedRouteId(route.id)}
+                  >
+                    <td style={{ padding: '8px 12px', fontWeight: 600 }}>
+                      {route.name || `Route Alternative ${idx + 1}`}
+                      {isLow && (
+                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#059669', background: '#DCFCE7', padding: '1px 5px', borderRadius: '3px' }}>
+                          LOWER PREDICTED FLOOD EXPOSURE
+                        </span>
+                      )}
+                      {isShort && (
+                        <span style={{ marginLeft: '6px', fontSize: '10px', color: '#0284C7', background: '#E0F2FE', padding: '1px 5px', borderRadius: '3px' }}>
+                          SHORTEST ROUTE
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ padding: '8px 12px' }}>{route.distance} km</td>
+                    <td style={{ padding: '8px 12px' }}>{route.travelTime} min</td>
+                    <td style={{ padding: '8px 12px', fontWeight: 600, color: maxD >= 30 ? '#DC2626' : maxD >= 15 ? '#D97706' : '#1E293B' }}>
+                      {typeof maxD === 'number' ? maxD.toFixed(1) : maxD} cm
+                    </td>
+                    <td style={{ padding: '8px 12px' }}>
+                      <span className={`route-status-pill status-${route.floodExposure === 'CRITICAL' ? 'danger' : route.floodExposure === 'HIGH' ? 'danger' : route.floodExposure === 'MODERATE' ? 'warning' : 'safe'}`}>
+                        {route.floodExposure || 'LOW'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '8px 12px' }}>
+                      {flooded} flooded ({blocked} critical)
+                    </td>
+                    <td style={{ padding: '8px 12px', textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        style={{
+                          padding: '3px 8px',
+                          fontSize: '11px',
+                          fontWeight: 500,
+                          borderRadius: '4px',
+                          border: '1px solid #CBD5E1',
+                          background: isSelected ? '#0F233A' : '#FFFFFF',
+                          color: isSelected ? '#FFFFFF' : '#334155',
+                          cursor: 'pointer',
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedRouteId(route.id)
+                        }}
+                      >
+                        {isSelected ? 'Selected' : 'Inspect'}
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+
       {/* ── Main Routing Workspace: Map (Left) + Comparison Cards (Right) (Section 13, 9) ── */}
       <div className="route-workspace">
         {/* Section 13: Route Map */}
@@ -383,7 +480,7 @@ function SafeRoutePage() {
             <div>
               <span className="eyebrow">ROAD NETWORK & FLOOD EXPOSURE</span>
               <h2>
-                {origin} ➔ {destination}
+                {origin} → {destination}
               </h2>
             </div>
             <span className="route-map-status">

@@ -16,10 +16,10 @@ export const delhiRegion = {
   defaultDestination: 'AIIMS',
   geocodeSuffix: 'New Delhi, Delhi, India',
   crisisCorridors: [
-    { label: 'Minto Bridge ➔ AIIMS', origin: 'Minto Bridge', destination: 'AIIMS' },
-    { label: 'Dhaula Kuan ➔ AIIMS', origin: 'Dhaula Kuan', destination: 'AIIMS' },
-    { label: 'ITO ➔ India Gate', origin: 'ITO Junction', destination: 'India Gate' },
-    { label: 'Sarai Kale Khan ➔ Ashram', origin: 'Sarai Kale Khan', destination: 'Ashram' },
+    { label: 'Minto Bridge → AIIMS', origin: 'Minto Bridge', destination: 'AIIMS' },
+    { label: 'Dhaula Kuan → AIIMS', origin: 'Dhaula Kuan', destination: 'AIIMS' },
+    { label: 'ITO → India Gate', origin: 'ITO Junction', destination: 'India Gate' },
+    { label: 'Sarai Kale Khan → Ashram', origin: 'Sarai Kale Khan', destination: 'Ashram' },
   ],
   wardCoordinates: {
     'W-DEL-01': [28.6328, 77.2197],

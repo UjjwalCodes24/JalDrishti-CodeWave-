@@ -319,10 +319,10 @@ function LandingPage() {
           </div>
           <div className="dashboard-preview reveal">
             <div className="preview-top"><span><i className="live-dot" /> JALDRISHTI / COMMAND CENTER</span><b>DEMONSTRATION · MUMBAI</b></div>
-            <div className="preview-alert"><span>🔴 OPERATIONAL ALERT</span><strong>CRITICAL ZONE DETECTED</strong><small>Predicted depth accumulation across low-lying corridors</small></div>
+            <div className="preview-alert"><span>OPERATIONAL ALERT</span><strong>CRITICAL ZONE DETECTED</strong><small>Predicted depth accumulation across low-lying corridors</small></div>
             <div className="preview-metrics"><span><b>61</b> mm/h rainfall</span><span><b>146.7</b> cm max depth</span><span><b>45</b> min to peak</span></div>
             <div className="preview-map"><div className="preview-radar" /><i /><i /><i /><span>DECISION SUPPORT SITUATION MAP</span></div>
-            <div className="preview-footer"><span>▰ 3 Critical zones</span><span>≋ 78% Drainage load</span><span>→ 2 Safe corridors</span></div>
+            <div className="preview-footer"><span>3 Critical Zones</span><span>78% Drainage Load</span><span>2 Safe Corridors</span></div>
           </div>
         </section>
 

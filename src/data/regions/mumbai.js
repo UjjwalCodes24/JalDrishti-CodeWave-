@@ -26,10 +26,10 @@ export const mumbaiRegion = {
   defaultDestination: 'Sion Hospital',
   geocodeSuffix: 'Mumbai, Maharashtra, India',
   crisisCorridors: [
-    { label: 'Kurla ➔ Sion Hospital', origin: 'Kurla Station', destination: 'Sion Hospital' },
-    { label: 'Andheri ➔ BKC', origin: 'Andheri East', destination: 'Bandra Kurla Complex' },
-    { label: 'Dharavi ➔ Airport', origin: 'Dharavi Junction', destination: 'Mumbai Airport' },
-    { label: 'BKC ➔ Bandra West', origin: 'Bandra Kurla Complex', destination: 'Bandra West' },
+    { label: 'Kurla → Sion Hospital', origin: 'Kurla Station', destination: 'Sion Hospital' },
+    { label: 'Andheri → BKC', origin: 'Andheri East', destination: 'Bandra Kurla Complex' },
+    { label: 'Dharavi → Airport', origin: 'Dharavi Junction', destination: 'Mumbai Airport' },
+    { label: 'BKC → Bandra West', origin: 'Bandra Kurla Complex', destination: 'Bandra West' },
   ],
   wardCoordinates: {
     W23: [19.0728, 72.8826],

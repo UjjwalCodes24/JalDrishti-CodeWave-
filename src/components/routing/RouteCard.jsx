@@ -182,7 +182,7 @@ export default function RouteCard({
           className={`route-select-btn ${isSelected ? 'active' : ''}`}
           onClick={() => onSelect && onSelect(route)}
         >
-          {isSelected ? '✓ SELECTED ON MAP' : 'INSPECT ON MAP'}
+          {isSelected ? 'SELECTED ON MAP' : 'INSPECT ON MAP'}
         </button>
       </div>
     </Panel>
